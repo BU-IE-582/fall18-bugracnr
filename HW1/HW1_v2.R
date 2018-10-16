@@ -157,6 +157,16 @@ legend("topright",cex = 0.75, legend = pinnacle_initial_yearly_analysis[odd_cut_
        fill = pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
 
 
+#time series data
+plot(pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)],cex=2, pch = 3, col= pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
+points(pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)],cex=2, pch = 4, col= pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
+lines(pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)], col = "blue")
+lines(pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)], col = "red")
+abline(h = 0.55, col = "black")
+abline(h = 0.60, col = "black")
+
+
+
 #bookmaker 2: Betsafe
 betsafe_over_under=odds_ov_un_initial[bookmaker=='Betsafe']
 
