@@ -87,31 +87,21 @@ pinnacle_initial[,totalProb:=NULL]
 cutpoints=seq(0,1,0.05)
 pinnacle_initial[,odd_cut_over:=cut(probOver,cutpoints)]
 
-#aggregate analysis
+#initial aggregate analysis
 pinnacle_initial_summary=pinnacle_initial[,list(empirical_over=mean(IsOver),
                                    probabilistic_over=mean(probOver),.N),
                              by=list(odd_cut_over)]
 
 
-plot(pinnacle_initial_summary[,list(empirical_over,probabilistic_over)],cex=4)
-abline(0,1,col='red')
 
-#analysis by years
-pinnacle_initial_yearly_analysis=pinnacle_initial[,list(empirical_over=mean(IsOver),
-                                   probabilistic_over=mean(probOver),.N),
-                             by=list(Year,odd_cut_over)]
 
-pinnacle_initial_yearly_analysis=pinnacle_initial_yearly_analysis[order(Year)]
-
-plot(pinnacle_initial_yearly_analysis[,list(empirical_over,probabilistic_over)],cex=1, col= pinnacle_initial_yearly_analysis$Year - 2009)
-abline(0,1,col='red')
-
+#final aggregate analysis
 #pinnacle final odds analysis
 pinnacle_over_under=odds_ov_un_final[bookmaker=='Pinnacle']
 
 pinnacle_wide_final=dcast(pinnacle_over_under,
-                            matchId~oddtype,
-                            value.var='final_odd')
+                          matchId~oddtype,
+                          value.var='final_odd')
 
 pinnacle_final=merge(matches[,c("matchId", "IsOver","Year")],pinnacle_wide_final,by='matchId')
 
@@ -132,22 +122,40 @@ pinnacle_final[,totalProb:=NULL]
 pinnacle_final[,odd_cut_over:=cut(probOver,cutpoints)]
 
 pinnacle_final_summary=pinnacle_final[,list(empirical_over=mean(IsOver),
-                                                probabilistic_over=mean(probOver),.N),
-                                          by=list(odd_cut_over)]
+                                            probabilistic_over=mean(probOver),.N),
+                                      by=list(odd_cut_over)]
 
-
-plot(pinnacle_final_summary[,list(empirical_over,probabilistic_over)],cex=4)
+#total aggreagate analysis
+plot(pinnacle_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(pinnacle_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
 abline(0,1,col='red')
+
+pinnacle_initial_summary
+pinnacle_final_summary
 
 #analysis by years
 pinnacle_final_yearly_analysis=pinnacle_final[,list(empirical_over=mean(IsOver),
-                                                        probabilistic_over=mean(probOver),.N),
-                                                  by=list(Year,odd_cut_over)]
+                                                    probabilistic_over=mean(probOver),.N),
+                                              by=list(Year,odd_cut_over)]
 
 pinnacle_final_yearly_analysis=pinnacle_final_yearly_analysis[order(Year)]
 
-plot(pinnacle_final_yearly_analysis[,list(empirical_over,probabilistic_over)],cex=4)
+#analysis by years
+pinnacle_initial_yearly_analysis=pinnacle_initial[,list(empirical_over=mean(IsOver),
+                                   probabilistic_over=mean(probOver),.N),
+                             by=list(Year,odd_cut_over)]
+
+pinnacle_initial_yearly_analysis=pinnacle_initial_yearly_analysis[order(Year)]
+pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]
+pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]"]
+plot(pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(empirical_over,probabilistic_over)],cex=2, pch = 2, col= pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
+points(pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(empirical_over,probabilistic_over)],cex=2, pch = 5, col= pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
 abline(0,1,col='red')
+abline(v = 0.55)
+abline(v = 0.60)
+legend("topright",cex = 0.75, legend = pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year, 
+       fill = pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
+
 
 #bookmaker 2: Betsafe
 betsafe_over_under=odds_ov_un_initial[bookmaker=='Betsafe']
@@ -236,3 +244,4 @@ betsafe_final_yearly_analysis=betsafe_final_yearly_analysis[order(Year)]
 
 plot(betsafe_final_yearly_analysis[,list(empirical_over,probabilistic_over)],cex=4)
 abline(0,1,col='red')
+
