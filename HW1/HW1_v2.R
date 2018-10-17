@@ -2,7 +2,8 @@ library(dplyr)
 require(data.table)
 require(anytime)
 
-rm(list=ls())
+rm(try)
+
 gc()
 
 #save paths of data files as strings
@@ -232,7 +233,59 @@ str(odds)
 head(odds)
 unique(odds$bookmaker)
 
-odds_1x2 <- odds[odds$betType == "1x2"]
+odds_1x2 <- odds[odds$betType == "1x2",]
 odds_1x2
 odds_1x2[,totalhandicap:=NULL]
 odds_1x2 <- odds_1x2[complete.cases(odds_1x2)]
+
+odds_1x2=odds_1x2[order(matchId, oddtype,bookmaker,date)]
+
+odds_1x2_initial=odds_1x2[,list(start_odd=odd[1]),
+                              by=list(matchId,oddtype,bookmaker)]
+
+odds_1x2_final=odds_1x2[,list(final_odd=odd[.N]),
+                            by=list(matchId,oddtype,bookmaker)]
+
+#merged_1x2 <- merge(odds_1x2_initial, odds_1x2_final, by = c("matchId", "oddtype", "bookmaker"))
+
+###melted all data
+melted_initial__1x2 <- dcast(odds_1x2_initial,
+                           matchId + bookmaker ~oddtype,
+                           value.var="start_odd")
+
+melted_initial__1x2[,prob1 := 1/odd1]
+melted_initial__1x2[,prob2 := 1/odd2]
+melted_initial__1x2[,probx := 1/oddX]
+melted_initial__1x2[,totalprob := prob1 + prob2 + probx]
+melted_initial__1x2
+melted_initial__1x2[,prob1 := prob1/totalprob]
+melted_initial__1x2[,prob2 := prob2/totalprob]
+melted_initial__1x2[,probx := probx/totalprob]
+melted_initial__1x2[,totalprob := NULL]
+melted_initial__1x2[complete.cases(melted_initial__1x2)]
+
+hist(melted_initial__1x2$prob1)
+hist(melted_initial__1x2$prob2)
+hist(melted_initial__1x2$probx)
+
+summary(melted_initial__1x2)
+summary(melted_final__1x2)
+
+melted_final__1x2 <- dcast(odds_1x2_final,
+      matchId + bookmaker ~oddtype,
+      value.var="final_odd")
+
+melted_final__1x2[,prob1 := 1/odd1]
+melted_final__1x2[,prob2 := 1/odd2]
+melted_final__1x2[,probx := 1/oddX]
+melted_final__1x2[,totalprob := prob1 + prob2 + probx]
+melted_final__1x2
+melted_final__1x2[,prob1 := prob1/totalprob]
+melted_final__1x2[,prob2 := prob2/totalprob]
+melted_final__1x2[,probx := probx/totalprob]
+melted_final__1x2[,totalprob := NULL]
+melted_final__1x2[complete.cases(melted_final__1x2)]
+
+hist(melted_final__1x2$prob1)
+hist(melted_final__1x2$prob2)
+hist(melted_final__1x2$probx)
