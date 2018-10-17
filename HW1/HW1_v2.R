@@ -37,6 +37,10 @@ matches[,TotalGoals:=HomeGoals+AwayGoals]
 # mark over under
 matches[,IsOver:=0]
 matches[TotalGoals>2,IsOver:=1]
+matches[,Is1 := HomeGoals > AwayGoals]
+matches[,Is2 := HomeGoals < AwayGoals]
+matches[,IsX := HomeGoals == AwayGoals]
+
 #filter all NAs
 matches=matches[complete.cases(matches)]
 
@@ -304,3 +308,55 @@ plot(initial_probx_hist, col = rgb(1,0,0,1/4), xlim = c(0,1))
 plot(final_probx_hist, col = rgb(0,0,1,1/4), xlim = c(0,1), add = TRUE)
 lines(initial_probx_hist$mids, initial_probx_hist$counts,  col = "red", type = "o")
 lines(final_probx_hist$mids, final_probx_hist$counts, col = "blue", type = "o")
+
+
+cutpoints=seq(0,1,0.05)
+melted_initial_1x2[,prob1_cut:=cut(prob1,cutpoints)]
+melted_initial_1x2[,prob2_cut:=cut(prob2,cutpoints)]
+melted_initial_1x2[,probx_cut:=cut(probx,cutpoints)]
+
+melted_final_1x2[,prob1_cut:=cut(prob1,cutpoints)]
+melted_final_1x2[,prob2_cut:=cut(prob2,cutpoints)]
+melted_final_1x2[,probx_cut:=cut(probx,cutpoints)]
+
+melted_final_1x2a <- merge(melted_final_1x2,matches[,c("matchId", "Is1","Is2","IsX")],by='matchId')
+
+pinnacle_1x2_initial <- melted_initial_1x2a[bookmaker=="Pinnacle"]
+pinnacle__1x2_initial_summary=pinnacle_1x2_initial[,list(empirical_over=mean(Is1),
+                                                probabilistic_over=mean(prob1),.N),
+                                          by=list(prob1_cut)]
+pinnacle_1x2_final <- melted_final_1x2a[bookmaker=="Pinnacle"]
+pinnacle__1x2_final_summary=pinnacle_1x2_final[,list(empirical_over=mean(Is1),
+                                                         probabilistic_over=mean(prob1),.N),
+                                                   by=list(prob1_cut)]
+
+plot(pinnacle__1x2_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(pinnacle__1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
+
+
+
+pinnacle_p2_1x2_initial_summary=pinnacle_1x2_initial[,list(empirical_over=mean(Is2),
+                                                         probabilistic_over=mean(prob2),.N),
+                                                   by=list(prob2_cut)]
+pinnacle_p2_1x2_final_summary=pinnacle_1x2_final[,list(empirical_over=mean(Is2),
+                                                     probabilistic_over=mean(prob2),.N),
+                                               by=list(prob2_cut)]
+
+plot(pinnacle_p2_1x2_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(pinnacle_p2_1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
+
+
+pinnacle_pX_1x2_initial_summary=pinnacle_1x2_initial[,list(empirical_over=mean(IsX),
+                                                           probabilistic_over=mean(probx),.N),
+                                                     by=list(probx_cut)]
+pinnacle_pX_1x2_final_summary=pinnacle_1x2_final[,list(empirical_over=mean(IsX),
+                                                       probabilistic_over=mean(probx),.N),
+                                                 by=list(probx_cut)]
+
+plot(pinnacle_pX_1x2_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(pinnacle_pX_1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
+
+
