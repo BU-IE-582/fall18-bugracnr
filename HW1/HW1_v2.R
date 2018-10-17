@@ -4,11 +4,10 @@ require(anytime)
 
 rm(list= ls())
 
-gc()
 
 #save paths of data files as strings
-matches_file_path = "C:/IE582HW1/IE582Fall2018_project_files/df9b1196-e3cf-4cc7-9159-f236fe738215_matches.rds"
-odd_details_file_path = "C:/IE582HW1/IE582Fall2018_project_files/df9b1196-e3cf-4cc7-9159-f236fe738215_odd_details.rds"
+matches_file_path = "HW1_Files/df9b1196-e3cf-4cc7-9159-f236fe738215_matches.rds"
+odd_details_file_path = "HW1_Files/df9b1196-e3cf-4cc7-9159-f236fe738215_odd_details.rds"
 
 
 #load data
