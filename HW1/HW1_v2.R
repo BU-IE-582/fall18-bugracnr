@@ -102,13 +102,11 @@ melted_ov_un_final <- dcast(odds_ov_un_final,
 pinnacle_initial <- initial_merged_data[bookmaker == "Pinnacle"]
 pinnacle_final <- final_merged_data[bookmaker == "Pinnacle"]
 
-#initial aggregate analysis
+
 pinnacle_initial_summary=pinnacle_initial[,list(empirical_over=mean(IsOver),
                                    probabilistic_over=mean(probOver),.N),
                              by=list(odd_cut_over)]
 
-
-#final aggregate analysis
 
 pinnacle_final_summary=pinnacle_final[,list(empirical_over=mean(IsOver),
                                             probabilistic_over=mean(probOver),.N),
@@ -119,6 +117,7 @@ plot(pinnacle_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, c
 points(pinnacle_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
 abline(0,1,col='red')
 
+####Task 1-b
 
 #analysis by years
 pinnacle_final_yearly_analysis=pinnacle_final[,list(empirical_over=mean(IsOver),
@@ -171,12 +170,53 @@ plotSeries <- function(initial_data, final_data, minprob, maxprob)
 }
 
 
+plotYears(pinnacle_initial_yearly_analysis,pinnacle_final_yearly_analysis,0.5,0.55)
+plotSeries(pinnacle_initial_yearly_analysis,pinnacle_final_yearly_analysis,0.5,0.55)
+
+
+#####Betsafe Part 1
+
+betsafe_initial <- initial_merged_data[bookmaker == "Betsafe"]
+betsafe_final <- final_merged_data[bookmaker == "Betsafe"]
+
+
+betsafe_initial_summary=betsafe_initial[,list(empirical_over=mean(IsOver),
+                                                probabilistic_over=mean(probOver),.N),
+                                          by=list(odd_cut_over)]
+
+
+betsafe_final_summary=betsafe_final[,list(empirical_over=mean(IsOver),
+                                            probabilistic_over=mean(probOver),.N),
+                                      by=list(odd_cut_over)]
+
+#total aggreagate analysis
+plot(betsafe_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(betsafe_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
+
+####Task 1-b
+
+#analysis by years
+betsafe_final_yearly_analysis=betsafe_final[,list(empirical_over=mean(IsOver),
+                                                    probabilistic_over=mean(probOver),.N),
+                                              by=list(Year,odd_cut_over)]
+
+betsafe_final_yearly_analysis=betsafe_final_yearly_analysis[order(Year)]
+
+#analysis by years
+betsafe_initial_yearly_analysis=betsafe_initial[,list(empirical_over=mean(IsOver),
+                                                        probabilistic_over=mean(probOver),.N),
+                                                  by=list(Year,odd_cut_over)]
+
+betsafe_initial_yearly_analysis=betsafe_initial_yearly_analysis[order(Year)]
+
+
+plotYears(betsafe_initial_yearly_analysis,betsafe_final_yearly_analysis,0.5,0.55)
+plotSeries(betsafe_initial_yearly_analysis,betsafe_final_yearly_analysis,0.5,0.55)
+
 
 
 ############### 1x2 Data will be worked on under this part
-str(odds)
-head(odds)
-unique(odds$bookmaker)
 
 odds_1x2 <- odds[odds$betType == "1x2",]
 odds_1x2
@@ -215,7 +255,6 @@ melted_initial_1x2[,probx_cut:=cut(probx,cutpoints)]
 melted_initial_1x2 <- merge(melted_initial_1x2,matches[,c("matchId", "Is1","Is2","IsX")],by='matchId')
 
 
-
 melted_final_1x2 <- dcast(odds_1x2_final,
       matchId + bookmaker ~oddtype,
       value.var="final_odd")
@@ -245,6 +284,7 @@ final_prob2_hist <- hist(melted_final_1x2$prob2)
 final_probx_hist <- hist(melted_final_1x2$probx)
 
 
+
 #histograms
 #prob1
 plot(initial_prob1_hist, col = rgb(1,0,0,1/4), xlim = c(0,1))
@@ -263,7 +303,7 @@ plot(final_probx_hist, col = rgb(0,0,1,1/4), xlim = c(0,1), add = TRUE)
 lines(initial_probx_hist$mids, initial_probx_hist$counts,  col = "red", type = "o")
 lines(final_probx_hist$mids, final_probx_hist$counts, col = "blue", type = "o")
 
-
+#Pinnacle Analysis
 pinnacle_1x2_initial <- melted_initial_1x2[bookmaker=="Pinnacle"]
 pinnacle_1x2_final <- melted_final_1x2[bookmaker=="Pinnacle"]
 
@@ -285,6 +325,7 @@ pinnacle_p2_1x2_final_summary=pinnacle_1x2_final[,list(empirical_over=mean(Is2),
 pinnacle_pX_1x2_initial_summary=pinnacle_1x2_initial[,list(empirical_over=mean(IsX),
                                                            probabilistic_over=mean(probx),.N),
                                                      by=list(probx_cut)]
+
 pinnacle_pX_1x2_final_summary=pinnacle_1x2_final[,list(empirical_over=mean(IsX),
                                                        probabilistic_over=mean(probx),.N),
                                                  by=list(probx_cut)]
@@ -304,4 +345,46 @@ plot(pinnacle_pX_1x2_initial_summary[,list(empirical_over,probabilistic_over)],c
 points(pinnacle_pX_1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
 abline(0,1,col='red')
 
+
+####Betsafe Analysis
+betsafe_1x2_initial <- melted_initial_1x2[bookmaker=="Betsafe"]
+betsafe_1x2_final <- melted_final_1x2[bookmaker=="Betsafe"]
+
+betsafe_p1_1x2_initial_summary=betsafe_1x2_initial[,list(empirical_over=mean(Is1),
+                                                           probabilistic_over=mean(prob1),.N),
+                                                     by=list(prob1_cut)]
+betsafe_p1_1x2_final_summary=betsafe_1x2_final[,list(empirical_over=mean(Is1),
+                                                       probabilistic_over=mean(prob1),.N),
+                                                 by=list(prob1_cut)]
+
+
+betsafe_p2_1x2_initial_summary=betsafe_1x2_initial[,list(empirical_over=mean(Is2),
+                                                           probabilistic_over=mean(prob2),.N),
+                                                     by=list(prob2_cut)]
+betsafe_p2_1x2_final_summary=betsafe_1x2_final[,list(empirical_over=mean(Is2),
+                                                       probabilistic_over=mean(prob2),.N),
+                                                 by=list(prob2_cut)]
+
+betsafe_pX_1x2_initial_summary=betsafe_1x2_initial[,list(empirical_over=mean(IsX),
+                                                           probabilistic_over=mean(probx),.N),
+                                                     by=list(probx_cut)]
+
+betsafe_pX_1x2_final_summary=betsafe_1x2_final[,list(empirical_over=mean(IsX),
+                                                       probabilistic_over=mean(probx),.N),
+                                                 by=list(probx_cut)]
+
+
+
+plot(betsafe_p1_1x2_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(betsafe_p1_1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
+
+plot(betsafe_p2_1x2_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(betsafe_p2_1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
+
+
+plot(betsafe_pX_1x2_initial_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "blue", pch = 2)
+points(betsafe_pX_1x2_final_summary[,list(empirical_over,probabilistic_over)],cex=2, col = "purple", pch = 5)
+abline(0,1,col='red')
 
