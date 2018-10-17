@@ -158,13 +158,17 @@ legend("topright",cex = 0.75, legend = pinnacle_initial_yearly_analysis[odd_cut_
 
 
 #time series data
-plot(pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)],cex=2, pch = 3, col= pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
-points(pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)],cex=2, pch = 4, col= pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]"]$Year - 2010)
-lines(pinnacle_initial_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)], col = "blue")
-lines(pinnacle_final_yearly_analysis[odd_cut_over == "(0.55,0.6]",list(Year,empirical_over)], col = "red")
-abline(h = 0.55, col = "black")
-abline(h = 0.60, col = "black")
+probCut <- "(0.5,0.55]"
+minVal <- min(pinnacle_initial_yearly_analysis[odd_cut_over == probCut,list(empirical_over)],pinnacle_final_yearly_analysis[odd_cut_over == probCut,list(empirical_over)])
+maxVal <- max(pinnacle_initial_yearly_analysis[odd_cut_over == probCut,list(empirical_over)],pinnacle_final_yearly_analysis[odd_cut_over == probCut,list(empirical_over)])
 
+plot(pinnacle_initial_yearly_analysis[odd_cut_over == probCut,list(Year,empirical_over)], ylim = c(minVal,maxVal), cex=2, pch = 3, col= pinnacle_initial_yearly_analysis[odd_cut_over == probCut]$Year - 2010)
+points(pinnacle_final_yearly_analysis[odd_cut_over == probCut,list(Year,empirical_over)],cex=2, pch = 4, col= pinnacle_initial_yearly_analysis[odd_cut_over == probCut]$Year - 2010)
+lines(pinnacle_initial_yearly_analysis[odd_cut_over == probCut,list(Year,empirical_over)], col = "blue")
+lines(pinnacle_final_yearly_analysis[odd_cut_over == probCut,list(Year,empirical_over)], col = "red")
+abline(h = 0.55, col = "black")
+abline(h = 0.50, col = "black")
+?plot
 
 
 #bookmaker 2: Betsafe
