@@ -2,7 +2,7 @@ library(dplyr)
 require(data.table)
 require(anytime)
 
-rm(try)
+rm(list= ls())
 
 gc()
 
@@ -47,8 +47,7 @@ matches[,c("HomeGoals","AwayGoals","TotalGoals") := NULL]
 #keep only over & under matches with 2.5 handicap
 odds_ov_un=odds[betType=='ou' & totalhandicap=='2.5']
 
-rm(odds)
-gc()
+
 
 #order data in ascending date & find initial and final matches
 odds_ov_un=odds_ov_un[order(matchId, oddtype,bookmaker,date)]
@@ -249,43 +248,59 @@ odds_1x2_final=odds_1x2[,list(final_odd=odd[.N]),
 #merged_1x2 <- merge(odds_1x2_initial, odds_1x2_final, by = c("matchId", "oddtype", "bookmaker"))
 
 ###melted all data
-melted_initial__1x2 <- dcast(odds_1x2_initial,
+melted_initial_1x2 <- dcast(odds_1x2_initial,
                            matchId + bookmaker ~oddtype,
                            value.var="start_odd")
 
-melted_initial__1x2[,prob1 := 1/odd1]
-melted_initial__1x2[,prob2 := 1/odd2]
-melted_initial__1x2[,probx := 1/oddX]
-melted_initial__1x2[,totalprob := prob1 + prob2 + probx]
-melted_initial__1x2
-melted_initial__1x2[,prob1 := prob1/totalprob]
-melted_initial__1x2[,prob2 := prob2/totalprob]
-melted_initial__1x2[,probx := probx/totalprob]
-melted_initial__1x2[,totalprob := NULL]
-melted_initial__1x2[complete.cases(melted_initial__1x2)]
+melted_initial_1x2[,prob1 := 1/odd1]
+melted_initial_1x2[,prob2 := 1/odd2]
+melted_initial_1x2[,probx := 1/oddX]
+melted_initial_1x2[,totalprob := prob1 + prob2 + probx]
+melted_initial_1x2
+melted_initial_1x2[,prob1 := prob1/totalprob]
+melted_initial_1x2[,prob2 := prob2/totalprob]
+melted_initial_1x2[,probx := probx/totalprob]
+melted_initial_1x2[,totalprob := NULL]
+melted_initial_1x2[complete.cases(melted_initial_1x2)]
 
-hist(melted_initial__1x2$prob1)
-hist(melted_initial__1x2$prob2)
-hist(melted_initial__1x2$probx)
 
-summary(melted_initial__1x2)
-summary(melted_final__1x2)
+summary(melted_initial_1x2)
+summary(melted_final_1x2)
 
-melted_final__1x2 <- dcast(odds_1x2_final,
+melted_final_1x2 <- dcast(odds_1x2_final,
       matchId + bookmaker ~oddtype,
       value.var="final_odd")
 
-melted_final__1x2[,prob1 := 1/odd1]
-melted_final__1x2[,prob2 := 1/odd2]
-melted_final__1x2[,probx := 1/oddX]
-melted_final__1x2[,totalprob := prob1 + prob2 + probx]
-melted_final__1x2
-melted_final__1x2[,prob1 := prob1/totalprob]
-melted_final__1x2[,prob2 := prob2/totalprob]
-melted_final__1x2[,probx := probx/totalprob]
-melted_final__1x2[,totalprob := NULL]
-melted_final__1x2[complete.cases(melted_final__1x2)]
+melted_final_1x2[,prob1 := 1/odd1]
+melted_final_1x2[,prob2 := 1/odd2]
+melted_final_1x2[,probx := 1/oddX]
+melted_final_1x2[,totalprob := prob1 + prob2 + probx]
+melted_final_1x2
+melted_final_1x2[,prob1 := prob1/totalprob]
+melted_final_1x2[,prob2 := prob2/totalprob]
+melted_final_1x2[,probx := probx/totalprob]
+melted_final_1x2[,totalprob := NULL]
+melted_final_1x2[complete.cases(melted_final_1x2)]
 
-hist(melted_final__1x2$prob1)
-hist(melted_final__1x2$prob2)
-hist(melted_final__1x2$probx)
+initial_prob1_hist <- hist(melted_initial_1x2$prob1)
+initial_prob2_hist <- hist(melted_initial_1x2$prob2)
+initial_probx_hist <- hist(melted_initial_1x2$probx)
+final_prob1_hist <- hist(melted_final_1x2$prob1)
+final_prob2_hist <- hist(melted_final_1x2$prob2)
+final_probx_hist <- hist(melted_final_1x2$probx)
+
+plot(initial_prob1_hist, col = rgb(1,0,0,1/4), xlim = c(0,1))
+plot(final_prob1_hist, col = rgb(0,0,1,1/4), xlim = c(0,1), add = TRUE)
+lines(initial_prob1_hist$mids, initial_prob1_hist$counts,  col = "red", type = "o")
+lines(final_prob1_hist$mids, final_prob1_hist$counts, col = "blue", type = "o")
+
+
+plot(initial_prob2_hist, col = rgb(1,0,0,1/4), xlim = c(0,1))
+plot(final_prob2_hist, col = rgb(0,0,1,1/4), xlim = c(0,1), add = TRUE)
+lines(initial_prob2_hist$mids, initial_prob2_hist$counts,  col = "red", type = "o")
+lines(final_prob2_hist$mids, final_prob2_hist$counts, col = "blue", type = "o")
+
+plot(initial_probx_hist, col = rgb(1,0,0,1/4), xlim = c(0,1))
+plot(final_probx_hist, col = rgb(0,0,1,1/4), xlim = c(0,1), add = TRUE)
+lines(initial_probx_hist$mids, initial_probx_hist$counts,  col = "red", type = "o")
+lines(final_probx_hist$mids, final_probx_hist$counts, col = "blue", type = "o")
