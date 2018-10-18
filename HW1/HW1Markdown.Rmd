@@ -1,6 +1,6 @@
 ---
 title: "Homework 1 Report"
-author: "Alim Buðra Çýnar - IE 582 - Fall 2018"
+author: "Alim Bugra Cinar - IE 582 - Fall 2018"
 date: "18 October 2018"
 ---
 
