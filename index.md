@@ -3,3 +3,7 @@
 ## Week 0 (September 20)
 
 [Here](files/bugra_homework_0.html) are my 5 examples
+
+## Week 4 (October 18)
+
+[Here](files/HW1Markdown.html) is my Homework 1 Solution.
