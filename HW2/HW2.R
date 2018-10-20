@@ -121,12 +121,106 @@ biplot(pca)
 summary(pca)
 str(pca)
 plot(pca)
-plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4))
+plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = wide_all$IsOver+2)
 
 head(pca)
 
 
 plot3d(pca$scores[,1:3], col = wide_all$IsOver + 2)
 
+odds_10Bet <- odds[bookmaker == "Expekt"]
 
 
+odds_ou_10Bet <- odds_10Bet[betType == "ou" & totalhandicap == "2.5"]
+
+
+odds_rest_10Bet <- odds_10Bet[odds_10Bet$betType != "ou",]
+odds_rest_10Bet <- odds_rest_10Bet[odds_rest_10Bet$betType != "ah",]
+
+odds_ou_10Bet[order(matchId,oddtype,bookmaker,date)]
+odds_rest_10Bet[order(matchId,oddtype,bookmaker,date)]
+
+odds_ov_un_initial=odds_ou_10Bet[,list(start_odd=odd[1]),
+                                 by=list(matchId,oddtype,bookmaker)]
+odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
+                                    by=list(matchId,oddtype,bookmaker)]
+
+
+
+
+matches <- matches[complete.cases(matches)]
+wide_ov_un_initial <- dcast(odds_ov_un_initial,
+                            matchId ~ bookmaker + oddtype,
+                            value.var="start_odd")
+wide_rest_initial <- dcast(odds_rest_initial,
+                           matchId ~ bookmaker + oddtype,
+                           value.var="start_odd")
+
+
+wide_all <- merge(wide_ov_un_initial,wide_rest_initial, by = "matchId")
+wide_all <- merge(matches[,c("matchId","IsOver")],wide_all, by.x = "matchId",by.y = "matchId")
+
+pca <- princomp(na.omit(wide_all[2:.N,2:7]), cor = TRUE)
+
+
+biplot(pca)
+
+summary(pca)
+str(pca)
+plot(pca)
+plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = wide_all$IsOver+2)
+
+head(pca)
+
+
+odds_10Bet <- odds[bookmaker == "bwin"]
+
+
+odds_ou_10Bet <- odds_10Bet[betType == "ou" & totalhandicap == "2.5"]
+
+
+odds_rest_10Bet <- odds_10Bet[odds_10Bet$betType != "ou",]
+odds_rest_10Bet <- odds_rest_10Bet[odds_rest_10Bet$betType != "ah",]
+
+odds_ou_10Bet[order(matchId,oddtype,bookmaker,date)]
+odds_rest_10Bet[order(matchId,oddtype,bookmaker,date)]
+
+odds_ov_un_initial=odds_ou_10Bet[,list(start_odd=odd[1]),
+                                 by=list(matchId,oddtype,bookmaker)]
+odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
+                                    by=list(matchId,oddtype,bookmaker)]
+
+
+
+
+matches <- matches[complete.cases(matches)]
+wide_ov_un_initial <- dcast(odds_ov_un_initial,
+                            matchId ~ bookmaker + oddtype,
+                            value.var="start_odd")
+wide_rest_initial <- dcast(odds_rest_initial,
+                           matchId ~ bookmaker + oddtype,
+                           value.var="start_odd")
+
+
+wide_all <- merge(wide_ov_un_initial,wide_rest_initial, by = "matchId")
+wide_all <- merge(matches[,c("matchId","IsOver")],wide_all, by.x = "matchId",by.y = "matchId")
+
+pca <- princomp(na.omit(wide_all[2:.N,2:7]), cor = TRUE)
+
+
+biplot(pca)
+
+summary(pca)
+str(pca)
+plot(pca)
+plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = wide_all$IsOver+2)
+
+head(pca)
+
+
+
+distmat <- dist(wide_all, method = "euclidean")
+head(distmat)
+mds=cmdscale(distmat)
+plot(mds[,1],mds[,2],main='Location',xlab='', ylab='',col=0)
+text(mds[,1],mds[,2],names(distmat),cex = .75,pos=4)
