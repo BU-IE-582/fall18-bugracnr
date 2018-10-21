@@ -3,6 +3,7 @@ require(anytime)
 require(dplyr)
 library(rgl)
 setwd("C:/IE_582_Rep/fall18-bugracnr/HW2")
+getwd()
 rm(list=ls())
 gc()
 
@@ -25,7 +26,10 @@ matches[,AwayGoals:=as.numeric(AwayGoals)]
 matches[,TotalGoals:=HomeGoals+AwayGoals]
 matches[,IsOver:=0]
 matches[TotalGoals>2,IsOver:=1]
-
+matches[,Is1 := HomeGoals > AwayGoals]
+matches[,Is2 := HomeGoals < AwayGoals]
+matches[,IsX := HomeGoals == AwayGoals]
+matches[,results := Is1*1 + Is2*2 + IsX*3]
 
 bmakers <- c("10Bet", "bwin", "Expekt", "Pinnacle", "1xBet")
 
@@ -47,26 +51,20 @@ class(matches)
 odds_ou[order(matchId,oddtype,bookmaker,date)]
 odds_rest[order(matchId,oddtype,bookmaker,date)]
 
-odds_ov_un_initial=odds_ou[,list(start_odd=odd[1]),
+odds_ov_un_initial=odds_ou[,list(final_odd=odd[.N]),
                               by=list(matchId,oddtype,bookmaker)]
-odds_rest_initial = odds_rest[,list(start_odd=odd[1]),
+odds_rest_initial = odds_rest[,list(final_odd=odd[.N]),
                             by=list(matchId,oddtype,bookmaker)]
 
 
 
-odds_ov_un_initial <- odds_ov_un_initial %>% filter(bookmaker %in% bmakers)  %>% mutate()
-odds_rest_initial <- odds_rest_initial %>% filter(bookmaker %in% bmakers)  %>% mutate()
-unique(odds_ov_un_initial$bookmaker)
-unique(odds_rest_initial$bookmaker)
-
-unique(odds$bookmaker)
 matches <- matches[complete.cases(matches)]
 wide_ov_un_initial <- dcast(odds_ov_un_initial,
                             matchId ~ bookmaker + oddtype,
-                            value.var="start_odd")
+                            value.var="final_odd")
 wide_rest_initial <- dcast(odds_rest_initial,
                             matchId ~ bookmaker + oddtype,
-                            value.var="start_odd")
+                            value.var="final_odd")
 
 odds_ov_un_initial[matchId =="004f4ING"]
 
@@ -81,21 +79,21 @@ pca <- princomp(na.omit(wide_all[2:.N,2:53]), cor = TRUE)
 
 
 
-odds_10Bet <- odds[bookmaker == "Pinnacle"]
+odds_pinnacle <- odds[bookmaker == "Pinnacle"]
 
 
-odds_ou_10Bet <- odds_10Bet[betType == "ou" & totalhandicap == "2.5"]
+odds_ou_pinnacle <- odds_pinnacle[betType == "ou" & totalhandicap == "2.5"]
 
 
-odds_rest_10Bet <- odds_10Bet[odds_10Bet$betType != "ou",]
-odds_rest_10Bet <- odds_rest_10Bet[odds_rest_10Bet$betType != "ah",]
+odds_rest_pinnacle <- odds_pinnacle[odds_pinnacle$betType != "ou",]
+odds_rest_pinnacle <- odds_rest_pinnacle[odds_rest_pinnacle$betType != "ah",]
 
-odds_ou_10Bet[order(matchId,oddtype,bookmaker,date)]
-odds_rest_10Bet[order(matchId,oddtype,bookmaker,date)]
+odds_ou_pinnacle[order(matchId,oddtype,bookmaker,date)]
+odds_rest_pinnacle[order(matchId,oddtype,bookmaker,date)]
 
-odds_ov_un_initial=odds_ou_10Bet[,list(start_odd=odd[1]),
+odds_ov_un_initial=odds_ou_pinnacle[,list(final_odd=odd[.N]),
                            by=list(matchId,oddtype,bookmaker)]
-odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
+odds_rest_initial = odds_rest_pinnacle[,list(final_odd=odd[.N]),
                               by=list(matchId,oddtype,bookmaker)]
 
 
@@ -104,10 +102,10 @@ odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
 matches <- matches[complete.cases(matches)]
 wide_ov_un_initial <- dcast(odds_ov_un_initial,
                             matchId ~ bookmaker + oddtype,
-                            value.var="start_odd")
+                            value.var="final_odd")
 wide_rest_initial <- dcast(odds_rest_initial,
                            matchId ~ bookmaker + oddtype,
-                           value.var="start_odd")
+                           value.var="final_odd")
 
 
 wide_all <- merge(wide_ov_un_initial,wide_rest_initial, by = "matchId")
@@ -124,7 +122,7 @@ plot(pca)
 plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = wide_all$IsOver+2)
 
 head(pca)
-
+pca$loadings
 
 plot3d(pca$scores[,1:3], col = wide_all$IsOver + 2)
 
@@ -140,9 +138,9 @@ odds_rest_10Bet <- odds_rest_10Bet[odds_rest_10Bet$betType != "ah",]
 odds_ou_10Bet[order(matchId,oddtype,bookmaker,date)]
 odds_rest_10Bet[order(matchId,oddtype,bookmaker,date)]
 
-odds_ov_un_initial=odds_ou_10Bet[,list(start_odd=odd[1]),
+odds_ov_un_initial=odds_ou_10Bet[,list(final_odd=odd[1]),
                                  by=list(matchId,oddtype,bookmaker)]
-odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
+odds_rest_initial = odds_rest_10Bet[,list(final_odd=odd[1]),
                                     by=list(matchId,oddtype,bookmaker)]
 
 
@@ -151,14 +149,14 @@ odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
 matches <- matches[complete.cases(matches)]
 wide_ov_un_initial <- dcast(odds_ov_un_initial,
                             matchId ~ bookmaker + oddtype,
-                            value.var="start_odd")
+                            value.var="final_odd")
 wide_rest_initial <- dcast(odds_rest_initial,
                            matchId ~ bookmaker + oddtype,
-                           value.var="start_odd")
+                           value.var="final_odd")
 
 
 wide_all <- merge(wide_ov_un_initial,wide_rest_initial, by = "matchId")
-wide_all <- merge(matches[,c("matchId","IsOver")],wide_all, by.x = "matchId",by.y = "matchId")
+#wide_all <- merge(matches[,c("matchId","IsOver")],wide_all, by.x = "matchId",by.y = "matchId")
 
 pca <- princomp(na.omit(wide_all[2:.N,2:7]), cor = TRUE)
 
@@ -168,7 +166,7 @@ biplot(pca)
 summary(pca)
 str(pca)
 plot(pca)
-plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = wide_all$IsOver+2)
+plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = matches$IsOver+2)
 
 head(pca)
 
@@ -185,9 +183,9 @@ odds_rest_10Bet <- odds_rest_10Bet[odds_rest_10Bet$betType != "ah",]
 odds_ou_10Bet[order(matchId,oddtype,bookmaker,date)]
 odds_rest_10Bet[order(matchId,oddtype,bookmaker,date)]
 
-odds_ov_un_initial=odds_ou_10Bet[,list(start_odd=odd[1]),
+odds_ov_un_initial=odds_ou_10Bet[,list(final_odd=odd[.N]),
                                  by=list(matchId,oddtype,bookmaker)]
-odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
+odds_rest_initial = odds_rest_10Bet[,list(final_odd=odd[.N]),
                                     by=list(matchId,oddtype,bookmaker)]
 
 
@@ -196,31 +194,25 @@ odds_rest_initial = odds_rest_10Bet[,list(start_odd=odd[1]),
 matches <- matches[complete.cases(matches)]
 wide_ov_un_initial <- dcast(odds_ov_un_initial,
                             matchId ~ bookmaker + oddtype,
-                            value.var="start_odd")
+                            value.var="final_odd")
 wide_rest_initial <- dcast(odds_rest_initial,
                            matchId ~ bookmaker + oddtype,
-                           value.var="start_odd")
+                           value.var="final_odd")
 
 
 wide_all <- merge(wide_ov_un_initial,wide_rest_initial, by = "matchId")
 wide_all <- merge(matches[,c("matchId","IsOver")],wide_all, by.x = "matchId",by.y = "matchId")
 
-pca <- princomp(na.omit(wide_all[2:.N,2:7]), cor = TRUE)
+pca <- princomp(na.omit(wide_all[2:.N,2:7]))
 
-
+plot(pca)
 biplot(pca)
 
 summary(pca)
 str(pca)
 plot(pca)
-plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = wide_all$IsOver+2)
+plot(pca$scores,ylim=c(-4,4),xlim=c(-4,4), col = matches$results)
 
 head(pca)
 
-
-
-distmat <- dist(wide_all, method = "euclidean")
-head(distmat)
-mds=cmdscale(distmat)
-plot(mds[,1],mds[,2],main='Location',xlab='', ylab='',col=0)
-text(mds[,1],mds[,2],names(distmat),cex = .75,pos=4)
+pca$loadings
