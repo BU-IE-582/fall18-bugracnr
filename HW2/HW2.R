@@ -219,22 +219,9 @@ pca$loadings
 
 
 wide_all
+?dist
+a <- dist(wide_all[,2:ncol(wide_all)], method = "manhattan")
 
-distmat <- matrix(c(1:nrow(wide_all)^2),nrow(wide_all))
-dim(distmat)
-
-b <- matrix(1:9, 3)
-b
-c <- dist(b)
-??distancematrix
-a <- dist(wide_all[,2:ncol(wide_all)])
-head(a)
-a
-(nrow(wide_all)-1)^2
-sqrt(length(a))
-b
-c
-class(c)
 
 distmat[,] <- sqrt(sum())
 
@@ -242,5 +229,4 @@ fit <- cmdscale(a)
 summary(fit)
 fit
 plot(fit[,1],fit[,2],main='Location',xlab='', ylab='',col=1)
-euclideanMDS=dist(fit)
-sum((as.matrix(euclideanMDS)-as.matrix(a))^2)
+
