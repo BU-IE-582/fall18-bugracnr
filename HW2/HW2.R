@@ -32,51 +32,52 @@ matches[,Is1 := HomeGoals > AwayGoals]
 matches[,Is2 := HomeGoals < AwayGoals]
 matches[,IsX := HomeGoals == AwayGoals]
 matches[,results := Is1*1 + Is2*2 + IsX*3]
+matches <- unique(matches)
 matches <- matches[complete.cases(matches)]
 
-bmakers <- c("10Bet", "Betfair Exchange", "bet365", "Betclic", "1xBet")
+bmakers <- c("Betsafe", "12BET", "bet365", "Betclic", "Pinnacle")
+bettypes <- unique(odds$betType)
+bettypes <- bettypes[c(-2, -6)]
 
-odds <- odds %>% filter(bookmaker %in% bmakers)  %>% mutate()
+odds_ou <- odds%>% filter(bookmaker %in% bmakers, betType == "ou", totalhandicap == "2.5") %>% mutate() 
+odds <- odds %>% filter(bookmaker %in% bmakers, betType %in%bettypes)  %>% mutate()
+odds <- rbind(odds,odds_ou)
 odds <- as.data.table(odds)
+odds <- odds[order(matchId, oddtype,bookmaker,date)]
+odds <- unique(odds)
 odds_final=odds[,list(final_odd=odd[.N]),
                               by=list(matchId,oddtype,bookmaker)]
 wide_final <- dcast(odds_final,
                             matchId ~ bookmaker + oddtype,
                             value.var="final_odd")
 
-pca <- princomp(na.omit(wide_final[2:.N,2:53]))
 
+
+wide_final <- wide_final[complete.cases(wide_final)]
+wide_final <- unique(wide_final)
+wide_final <- wide_final[matchId %in% matches$matchId]
+
+match_colors <- merge(wide_final[,"matchId"], matches[,c("matchId", "IsOver", "results")], by = "matchId")
+
+pca <- princomp(wide_final[,2:ncol(wide_final)])
+
+biplot(pca)
 summary(pca)
+plot(pca)
+results <- pca$loadings[,1:2]
 
-plot(pca$scores, col = matches$IsOver + 2)
-plot(pca$scores, col = matches$results + 1)
-
-a <- dist(wide_final[,2:ncol(wide_final)], method = "euclidean")
-
-
-fit <- cmdscale(a)
-summary(fit)
-fit
-plot(fit[,1],fit[,2],main='Location',xlab='', ylab='',col=1)
+plot(pca$scores, col = match_colors$IsOver + 2)
+plot(pca$scores, col = match_colors$results + 1)
 
 
-odds_10Bet <- odds[bookmaker == "10Bet"]
-odds_10Bet_final=odds_10Bet[,list(final_odd=odd[.N]),
-                by=list(matchId,oddtype,bookmaker)]
-wide_10Bet_final <- dcast(odds_10Bet_final,
-                    matchId ~ bookmaker + oddtype,
-                    value.var="final_odd")
+manhattan_distances <- dist(na.omit(wide_final[,2:ncol(wide_final)]), method = "manhattan")
+euclidean_distances <- dist(na.omit(wide_final[,2:ncol(wide_final)]), method = "euclidean")
 
-pca <- princomp(na.omit(wide_10Bet_final[2:.N,2:ncol(wide_10Bet_final)]))
-plot(pca$scores, col = matches$IsOver + 2)
-plot(pca$scores, col = matches$results + 1)
+fit_manhattan <- cmdscale(manhattan_distances)
+plot(fit_manhattan[,1],fit_manhattan[,2],main='Location',xlab='', ylab='',col= match_colors$IsOver + 2)
+
+fit_euclidean <- cmdscale(euclidean_distances)
+plot(fit_euclidean[,1],fit_euclidean[,2],main='Location',xlab='', ylab='',col= match_colors$IsOver + 2)
 
 
-a <- dist(wide_10Bet_final[,2:ncol(wide_10Bet_final)], method = "manhattan")
-
-
-fit <- cmdscale(a)
-summary(fit)
-fit
-plot(fit[,1],fit[,2],main='Location',xlab='', ylab='')
 
