@@ -1,0 +1,414 @@
+---
+title: "IE 582 - Homework 2"
+author: "Alim Bugra Cinar"
+date: "26 October 2018"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width = 10, fig.height = 8)
+```
+
+# 1. Introduction
+
+  In this project, we have 3 tasks. In the first task, we will explore relationships among odds and over/under scores. To explore, we will firstly apply PCA analysis, then will do MDS. Finally, we will conclude by comparing PCA and MDS results.
+  
+  In the second part, we will make the same analysis for home, away and tie scores.
+  
+  In the last task, we will do some image processing. We will try to compress images by using PCA.
+  
+# 2. Task 1 & 2
+
+## 2.1 Data Preprocessing
+
+First, I will install the libraries and data I will use.
+
+```{r}
+require(data.table)
+require(anytime)
+require(dplyr)
+
+setwd("C:/IE_582_Rep/fall18-bugracnr/HW2")
+
+#save paths
+matches_file_path = "HW2_Files/df9b1196-e3cf-4cc7-9159-f236fe738215_matches.rds"
+odd_details_file_path = "HW2_Files/df9b1196-e3cf-4cc7-9159-f236fe738215_odd_details.rds"
+
+#load data
+matches=readRDS(matches_file_path)
+odds=readRDS(odd_details_file_path)
+
+```
+
+
+Now, I need to process matches data. I will add over/under & 1x2 results at the end.
+
+```{r}
+matches[,match_time:=anytime(date)]
+matches[,Year:=year(match_time)]
+matches[,c("match_time","date","leagueId","type"):=NULL]
+
+#Over Under & 1x2 Results
+matches[,c("HomeGoals","AwayGoals"):=tstrsplit(score,':')]
+matches$HomeGoals=as.numeric(matches$HomeGoals)
+matches[,AwayGoals:=as.numeric(AwayGoals)]
+matches[,TotalGoals:=HomeGoals+AwayGoals]
+matches[,IsOver:=0]
+matches[TotalGoals>2,IsOver:=1]
+matches[,Is1 := HomeGoals > AwayGoals]
+matches[,Is2 := HomeGoals < AwayGoals]
+matches[,IsX := HomeGoals == AwayGoals]
+matches[,results := Is1*1 + Is2*2 + IsX*3]
+matches <- unique(matches)
+matches <- matches[complete.cases(matches)]
+```
+
+I need to process odds data as well. I will filter the bookmakers and the bettypes that I will use. I will remove asian handicap, as I won't include it in my analysis. Also, I will only use 2.5 handicap in over under bets.
+
+```{r}
+bmakers <- c("Betsafe", "12BET", "bet365", "Betclic", "Pinnacle")
+bettypes <- unique(odds$betType)
+bettypes <- bettypes[c(-2, -6)]
+
+odds_ou <- odds%>% filter(bookmaker %in% bmakers, betType == "ou", totalhandicap == "2.5") %>% mutate() 
+odds <- odds %>% filter(bookmaker %in% bmakers, betType %in%bettypes)  %>% mutate()
+odds <- rbind(odds,odds_ou)
+odds <- as.data.table(odds)
+odds <- odds[order(matchId, oddtype,bookmaker,date)]
+odds <- unique(odds)
+
+```
+
+
+Now, I need to create my feature vector for the analysis. I will transform my data into wide format. I will also create a color dataset for later use.
+
+```{r}
+odds_final=odds[,list(final_odd=odd[.N]),
+                              by=list(matchId,oddtype,bookmaker)]
+wide_final <- dcast(odds_final,
+                            matchId ~ bookmaker + oddtype,
+                            value.var="final_odd")
+
+wide_final <- wide_final[complete.cases(wide_final)]
+wide_final <- unique(wide_final)
+wide_final <- wide_final[matchId %in% matches$matchId]
+
+match_colors <- merge(wide_final[,"matchId"], matches[,c("matchId", "IsOver", "results")], by = "matchId")
+```
+
+## 2.2 Task 1.a & 2: PCA Analysis
+
+I will firstly apply PCA on my data. Then, draw a biplot to get some insight.
+
+```{r}
+pca <- princomp(wide_final[,2:ncol(wide_final)])
+biplot(pca, xlab = "Component 1", ylab = "Component 2")
+
+```
+
+As there are plenty of features, biplot seems confusing. However, we can observe that odd1 and odd2 features for all bookmakers will be meaningful for explaining variance.
+
+Now, I will explore the proportion of variance explained by the components. 
+
+```{r}
+summary(pca)
+```
+
+
+As you can see in the above table, component 1 & 2 explain 98% of total variance. Between them, component 1 explains 79.8% of total variance while component 2 is explaining the remaining 18.33%. Now, I will visualize that information in a histogram.
+
+```{r}
+plot(pca)
+```
+
+As we can see in the histogram, almost all of the variance is explained by the first two components. Now, let's see the relationship between components with the features.
+
+```{r}
+pca$loadings[,1:2]
+```
+
+The table above shows that, the most contributed features for component 1 are the odd1, 1, odd2 and 2 features of all bookmakers. This is not surprising as we observed this fact in the biplot. 2nd component is mostly contributed by odd1, odd2, oddX, 1, and 2 features of all bookmakers.
+
+Now, let's try to see if there is a relationship between the results of PCA and the match results.
+
+```{r}
+par(mfrow = c(1,2))
+plot(pca$scores, col = match_colors$IsOver + 2, xlab = "Component 1", ylab = "Component 2", main = "Over/Under & PCA Results")
+legend("bottomright",cex = 0.55, legend = c("Under", "Over"), 
+       fill = 2:3)
+plot(pca$scores, col = match_colors$results + 1, xlab = "Component 1", ylab = "Component 2", main = "Home/Away/Tie & PCA Results")
+legend("bottomright",cex = 0.55, legend = c("Home", "Away", "Tie"), 
+       fill = 2:4)
+```
+
+On the left hand side, you can see the relationship between PCA and over under results. As it can be observed, the results are distributed randomly, and there is no significant relationship. On the right hand side, the same plot is colored with Home, Away and Tie results for the Task 2. Away scores are mostly collected on the right hand side of the plot, while home scores are collected in the opposite side of the graph. 
+
+## 2.3 Task 1.b & 1.c
+
+  In this part, I will apply MDS analysis with Euclidean and Manhattan distances to the same data.
+  
+  First, I need to create distance matrices. Then, I will run the analysis, and plot the results.
+  
+  
+```{r}
+manhattan_distances <- dist(na.omit(wide_final[,2:ncol(wide_final)]), method = "manhattan")
+euclidean_distances <- dist(na.omit(wide_final[,2:ncol(wide_final)]), method = "euclidean")
+
+fit_manhattan <- cmdscale(manhattan_distances)
+fit_euclidean <- cmdscale(euclidean_distances)
+
+```
+  
+```{r}
+par(mfrow = c(1,2))
+plot(fit_manhattan[,1],fit_manhattan[,2],main='MDS with Manhattan Distances',xlab='', ylab='',col= match_colors$IsOver + 2)
+legend("bottomleft",cex = 0.55, legend = c("Under", "Over"), 
+       fill = 2:3)
+plot(fit_euclidean[,1],fit_euclidean[,2],main='MDS with Euclidean Distances',xlab='', ylab='',col= match_colors$IsOver + 2)
+legend("bottomleft",cex = 0.55, legend = c("Under", "Over"), 
+       fill = 2:3)
+```
+
+In both of the MDS results, shapes are reverse of PCA results. In Manhattan distance results, the data more sparsely distributed along an opposite V shape, while Euclidean results are more dense. In both of the plots, we observe no significant grouping of the results. Both of them are distributed randomly.
+
+# 3. Task 3
+
+## 3.1 Reading Image
+
+Firstly, I will install libraries and data. The picture that I will process will be the famous Renaissance artist Raphael's School of Athens fresco.
+
+```{r}
+library(jpeg)
+library(imager)
+library(data.table)
+
+
+
+path <- "C:/IE_582_Rep/fall18-bugracnr/HW2"
+
+setwd(path)
+
+pic <- readJPEG("HW2_Files/HW2_Part3.jpeg")
+
+```
+
+
+First, let's take a look at some information about the image.
+
+```{r}
+class(pic)
+typeof(pic)
+str(pic)
+dim(pic)
+range(pic)
+```
+
+The image is an array, whose entries are doubles. The dimensions are 512*512*3 (512*512 for pixels & 3 for rgb channels). The range of values is distributed between 0 & 1.
+
+
+## 3.1 Displaying Image
+
+Now, let's display the image. I will use rasterImage function for that.
+
+```{r}
+par(mfrow = c(1,1))
+x <- 1:512
+y <- 1:512
+plot(x,y, ann = FALSE, axes = FALSE, col = 0)
+rasterImage(pic, 0,0,512,512)
+```
+
+The painting is displayed above. Now, let's display each channel seperately. To do that, I will first create 3 matrices seperately for each channel, and create color palettes. Then, I will display.
+
+```{r}
+r <- t(apply(pic[,,1],2,rev))
+g <- t(apply(pic[,,2],2,rev))
+b <- t(apply(pic[,,3],2,rev))
+
+redPal <- colorRampPalette(c("black", "red"))
+greenPal <- colorRampPalette(c("black", "green"))
+bluePal <- colorRampPalette(c("black", "blue"))
+
+par(mfrow = c(1,3))
+image(r, col = redPal(256), ann = TRUE, axes = FALSE, main = "R Channel" , xlab = "",ylab = "")
+image(g, col = greenPal(256), ann = TRUE, axes = FALSE, main = "G Channel" , xlab = "",ylab = "")
+image(b, col = bluePal(256), ann = TRUE, axes = FALSE, main = "B Channel", xlab = "",ylab = "" )
+
+```
+
+
+## 3.3 Adding Noise
+
+Now, I will add noise to the picture. First, I will add noise each of the channels. Then, I will normalize them, and at last I will display the noisy image side-by-side with the original image.
+
+```{r}
+
+set.seed(1)
+noise_1 <-  matrix(runif(512*512, min = 0, max = 0.1),512)
+set.seed(2)
+noise_2 <-  matrix(runif(512*512, min = 0, max = 0.1),512)
+set.seed(3)
+noise_3 <-  matrix(runif(512*512, min = 0, max = 0.1),512)
+
+noisy_pic <- pic
+
+noisy_pic[,,1] <- pic[,,1] + noise_1
+noisy_pic[,,2] <- pic[,,2] + noise_2
+noisy_pic[,,3] <- pic[,,3] + noise_3
+
+noisy_pic <- noisy_pic/max(noisy_pic)
+
+
+noisy_r <- t(apply(noisy_pic[,,1],2,rev))
+noisy_g <- t(apply(noisy_pic[,,2],2,rev))
+noisy_b <- t(apply(noisy_pic[,,3],2,rev))
+
+
+```
+
+```{r}
+par(mfrow = c(1,2))
+plot(x,y, axes = FALSE, col = 0, xlab = "",ylab = "", main = "Noisy Image")
+rasterImage(noisy_pic, 0,0,512,512)
+plot(x,y, axes = FALSE ,xlab = "",ylab = "", col = 0, main = "Original Image")
+rasterImage(pic, 0,0,512,512)
+```
+
+Now, let's display channel's of the noisy image side-by-side.
+
+```{r}
+par(mfrow = c(1,3))
+image(noisy_r, col = redPal(256), ann = TRUE, axes = FALSE, main = "R Channel" , xlab = "",ylab = "")
+image(noisy_g, col = greenPal(256), ann = TRUE, axes = FALSE, main = "G Channel" , xlab = "",ylab = "")
+image(noisy_b, col = bluePal(256), ann = TRUE, axes = FALSE, main = "B Channel", xlab = "",ylab = "" )
+```
+
+## 3.4 Processing the Noisy Image
+
+### 3.4.1 Transformation to Greyscale & PCA
+To start processing, I will transform my image to greyscale. I will use a straightforward approach to do that. I will simply take averages of each channel and normalize the result. Then, I will display the greyscale image.
+
+```{r}
+noisy_grey <- noisy_pic[,,1] + noisy_pic[,,2] + noisy_pic[,,3]
+noisy_grey <- noisy_grey/max(noisy_grey)  
+par(mfrow = c(1,1))
+plot(x,y, main = "Greyscale Image", xlab = "", ylab = "", axes = FALSE, col = 0)
+rasterImage(noisy_grey,0,0,512,512)
+
+```
+
+Now, I will continue with the PCA analysis. I will use 3x3 channels in my analysis. There will be 510*510 patches.
+
+To do PCA, I will need a feature vector. The feature vector will be the vector of patches. The 3x3 patches will be transformed into vectors with length 9, for each of 510x510 patches. To do that operation, I will firstly allocate a memory for the vectors for the sake of computational speed. Then, the transformation will be done in a loop. Finally, the resulting list of vectors will be transformed into a data table for further operations.
+
+```{r}
+sample_vector <- rep(NA,9)
+imgdata <- rep(list(sample_vector), 510*510)
+
+k <- 1
+
+for (i in 2:511) {
+  for (j in 2:511) {
+    imgdata[[k]] <- as.vector(noisy_grey[(i-1):(i+1),(j-1):(j+1)])
+    k <- k+1
+  }
+}
+
+imgdata <- as.data.table(matrix(unlist(imgdata), ncol = 9, byrow = TRUE))
+
+
+```
+
+Now, I have the data with dimensions (510x510)x9. I can simply apply PCA on that data.
+
+```{r}
+noisy_pca <- princomp(imgdata)
+plot(noisy_pca)
+summary(noisy_pca)
+
+```
+
+As it can be observed from the above histogram and table, component 1 explains 91.7% of all variance by itself, which is a huge proportion. Second and third components explain 2.8% and 1.8% of variance respectively.
+
+### 3.4.2 Reconstruction
+
+As the components converts pixel values in the original image into the scores of PCA, it is possible to reconstruct the image from the scores. We expect to see higher variance explaining components will reconstruct the image closer to the unprocessed noisy image.
+
+To reconstruct the images, we need to process scores. Scores are firstly normalized, then, turned into matrices. At last, they are displayed by the rasterImage function. 
+
+```{r}
+score_1 <- noisy_pca$scores[,1]
+score_2 <- noisy_pca$scores[,2]
+score_3 <- noisy_pca$scores[,3]
+
+score_1 <- (score_1 - min(score_1))/(max(score_1)-min(score_1))
+score_2 <- (score_2 - min(score_2))/(max(score_2)-min(score_2))
+score_3 <- (score_3 - min(score_3))/(max(score_3)-min(score_3))
+
+
+mat_score_1 <- matrix(score_1, 510, byrow=TRUE)
+mat_score_2 <- matrix(score_2, 510, byrow=TRUE)
+mat_score_3 <- matrix(score_3, 510, byrow=TRUE)
+```
+
+
+```{r}
+par(mfrow = c(1,2))
+plot(1:512,1:512, ann = TRUE, axes = FALSE, col = 0, main = "Unprocessed Image", xlab = "", ylab = "")
+rasterImage(noisy_grey,0,0,512,512)
+plot(x,y, ann = TRUE, axes = FALSE, col = 0, main = "Component 1 Reconstruction", xlab = "", ylab = "")
+rasterImage(mat_score_1,0,0,510,510)
+par(mfrow = c(1,2))
+plot(x,y, ann = TRUE, axes = FALSE, col = 0, main = "Component 2 Reconstruction", xlab = "", ylab = "")
+rasterImage(mat_score_2,0,0,510,510)
+plot(x,y, ann = TRUE, axes = FALSE, col = 0, main = "Component 3 Reconstruction", xlab = "", ylab = "")
+rasterImage(mat_score_3,0,0,510,510)
+
+```
+
+A it can be seen above, the reconstruction of component 1 is very close to the unprocessed image. The others are only shows the silhouettes.
+
+
+### 3.4.3 Eigenvector Analysis
+
+As the eigenvectors are in charge of transformation, we can get valuable information from them. We will plot eigenvectors as images to see how they affect the patches.
+
+To do that operation, I will firstly normalize the eigenvectors, then convert them into matrices. At lasti I will display them.
+
+```{r}
+eigen_1 <- noisy_pca$loadings[,1]
+eigen_2 <- noisy_pca$loadings[,2]
+eigen_3 <- noisy_pca$loadings[,3]
+
+eigen_1 <- (eigen_1 - min(eigen_1))/(max(eigen_1)-min(eigen_1))
+eigen_2 <- (eigen_2 - min(eigen_2))/(max(eigen_2)-min(eigen_2))
+eigen_3 <- (eigen_3 - min(eigen_3))/(max(eigen_3)-min(eigen_3))
+
+eigenmat_1 <- matrix(eigen_1,3)
+eigenmat_2 <- matrix(eigen_2,3)
+eigenmat_3 <- matrix(eigen_3,3)
+
+noisy_pca$loadings[,1:3]
+
+```
+
+```{r}
+greyPal <- colorRampPalette(c("black","grey"))
+
+par(mfrow=c(1,3))
+image(eigenmat_1, col = greyPal(256), ann = TRUE, axes = FALSE, main = "Eigenvector 1", xlab = "", ylab = "")
+image(eigenmat_2, col = greyPal(256), ann = TRUE, axes = FALSE, main = "Eigenvector 2", xlab = "", ylab = "")
+image(eigenmat_3, col = greyPal(256), ann = TRUE, axes = FALSE, main = "Eigenvector 3", xlab = "", ylab = "")
+
+
+```
+
+
+As it can be observed in the above images and the table, first eigenvector is distributed uniformly. Which means, all of the pixels in patches has similar weights. This results in better reconstructionof the image. The second and third eigenvectors has similar weights in the same rows and columns respectively. This resulted in the gradient view in the displays of eigenvectors, and also the shady display of reconstructions. 
+
+
+# 4. Conclusion
+In this project, I worked on odd data in part 1&2, and image data in part 3. I mainly used PCA, and MDS analysis in the first two parts. There were no significant relationship found between the feature vector and the results.
+In the image processing part I only used PCA. I was able to successfully load and process the image. I also applied PCA on the image data and was able to successfully reconstruct the image.
+
+

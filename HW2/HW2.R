@@ -1,13 +1,8 @@
 require(data.table)
 require(anytime)
 require(dplyr)
-library(rgl)
 
 setwd("C:/IE_582_Rep/fall18-bugracnr/HW2")
-getwd()
-
-rm(list=ls())
-gc()
 
 #save paths
 matches_file_path = "HW2_Files/df9b1196-e3cf-4cc7-9159-f236fe738215_matches.rds"
@@ -45,13 +40,12 @@ odds <- rbind(odds,odds_ou)
 odds <- as.data.table(odds)
 odds <- odds[order(matchId, oddtype,bookmaker,date)]
 odds <- unique(odds)
+
 odds_final=odds[,list(final_odd=odd[.N]),
                               by=list(matchId,oddtype,bookmaker)]
 wide_final <- dcast(odds_final,
                             matchId ~ bookmaker + oddtype,
                             value.var="final_odd")
-
-
 
 wide_final <- wide_final[complete.cases(wide_final)]
 wide_final <- unique(wide_final)
@@ -59,13 +53,16 @@ wide_final <- wide_final[matchId %in% matches$matchId]
 
 match_colors <- merge(wide_final[,"matchId"], matches[,c("matchId", "IsOver", "results")], by = "matchId")
 
+
+
 pca <- princomp(wide_final[,2:ncol(wide_final)])
 
 biplot(pca)
+
 summary(pca)
 plot(pca)
-results <- pca$loadings[,1:2]
 
+par(mfrow = c(2,1))
 plot(pca$scores, col = match_colors$IsOver + 2)
 plot(pca$scores, col = match_colors$results + 1)
 
