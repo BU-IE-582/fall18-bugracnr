@@ -124,7 +124,8 @@ for(i in 1:nofReplications) {
 }
 
 cvresult[,list(Accu=mean(Predictions==Real)),by=list(Method,Klev)]
-table(cvresult$Predictions, cvresult$Real)
+confusion_matrix <- table(cvresult$Predictions, cvresult$Real)
+accuracy <- sum(diag(confusion_matrix))/sum(confusion_matrix)
 
 #backup start 
 combined=rbind(traindata[testindices,],traindata)
