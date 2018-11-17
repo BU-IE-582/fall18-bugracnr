@@ -11,3 +11,7 @@
 ## Week 5 (October 26)
 
 [Here](files/HW2_Markdown.html) is my Homework 2 Solution.
+
+## Week 8 (November 17)
+
+[Here](files/HW3_Markdown.html) is my Homework 3 Solution.
