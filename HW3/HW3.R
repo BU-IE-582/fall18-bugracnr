@@ -1,15 +1,11 @@
-require(plotly)
 require(scatterplot3d)
 require(FNN)
 require(glmnet)
 require(TunePareto)
 require(data.table)
 require(RANN.L1)
-require(dplyr)
 
-rm(list=ls())
-gc()
-
+### Data Paths
 path_xtest <- gsub  ( "\\\\",  "/", "C:/IE_582_Rep/fall18-bugracnr/HW3/HW3_Files/uWaveGestureLibrary_X_TEST"   )
 path_xtrain <- gsub  ( "\\\\",  "/", "C:/IE_582_Rep/fall18-bugracnr/HW3/HW3_Files/uWaveGestureLibrary_X_TRAIN"   )
 path_ytest <- gsub  ( "\\\\",  "/", "C:/IE_582_Rep/fall18-bugracnr/HW3/HW3_Files/uWaveGestureLibrary_Y_TEST"   )
@@ -17,6 +13,8 @@ path_ytrain <- gsub  ( "\\\\",  "/", "C:/IE_582_Rep/fall18-bugracnr/HW3/HW3_File
 path_ztest <- gsub  ( "\\\\",  "/", "C:/IE_582_Rep/fall18-bugracnr/HW3/HW3_Files/uWaveGestureLibrary_Z_TEST"   )
 path_ztrain <- gsub  ( "\\\\",  "/", "C:/IE_582_Rep/fall18-bugracnr/HW3/HW3_Files/uWaveGestureLibrary_Z_TRAIN"   )
 
+
+### Loading Data
 xtest <- read.table(path_xtest)
 ytest <- read.table(path_ytest)
 ztest <- read.table(path_ztest)
@@ -24,13 +22,17 @@ xtrain <- read.table(path_xtrain)
 ytrain <- read.table(path_ytrain)
 ztrain <- read.table(path_ztrain)
 
-cols <- rep("black",315)
-cols[1] <- "blue"
-cols[315] <- "red"
-shapes <- rep(".",315)
-shapes[1] <- 1
-shapes[315] <- 4
 
+### Color and Shape Values
+cols <- rep("black",315)
+cols[1:25] <- "blue"
+cols[290:315] <- "red"
+shapes <- rep(1,315)
+shapes[1:25] <- 2
+shapes[290:315] <- 4
+
+
+### Function: pathplotter
 pathplotter <- function(ax,ay,az)
 {
   vx <- cumsum(ax)
@@ -55,7 +57,7 @@ pathplotter <- function(ax,ay,az)
   xy <- cumsum(xy) + cumsum(vy)
   xz <- cumsum(xz) + cumsum(vz)
   
-  scatterplot3d(xz,xy,xx, color = cols, pch = shapes)
+  scatterplot3d(xx,xy,xz, color = cols, pch = shapes)
 }
 
 ############### TASK 1.1
@@ -82,11 +84,11 @@ pathplotter(ax,ay,az)
 
 
 #class 3 instance
-xtrain[4,1]
+xtrain[13,1]
 
-ax <- unlist(xtrain[4,2:ncol(xtrain)])
-ay <- unlist(ytrain[4,2:ncol(xtrain)])
-az <- unlist(ztrain[4,2:ncol(xtrain)])
+ax <- unlist(xtrain[13,2:ncol(xtrain)])
+ay <- unlist(ytrain[13,2:ncol(xtrain)])
+az <- unlist(ztrain[13,2:ncol(xtrain)])
 
 
 pathplotter(ax,ay,az)
@@ -102,11 +104,11 @@ az <- unlist(ztrain[5,2:ncol(xtrain)])
 pathplotter(ax,ay,az)
 
 #class 5 instance
-xtrain[2,1]
+xtrain[3,1]
 
-ax <- unlist(xtrain[2,2:ncol(xtrain)])
-ay <- unlist(ytrain[2,2:ncol(xtrain)])
-az <- unlist(ztrain[2,2:ncol(xtrain)])
+ax <- unlist(xtrain[3,2:ncol(xtrain)])
+ay <- unlist(ytrain[3,2:ncol(xtrain)])
+az <- unlist(ztrain[3,2:ncol(xtrain)])
 
 
 pathplotter(ax,ay,az)
@@ -156,8 +158,10 @@ testclass <- xtest[,1]
 colnum <- ncol(xtrain)
 
 testdata <- cbind(xtest[,2:colnum],ytest[,2:colnum],ztest[,2:colnum])
+testdata <- scale(testdata)
 
 traindata <- cbind(xtrain[,2:colnum],ytrain[,2:colnum],ztrain[,2:colnum])
+traindata <- scale(traindata)
 
 ########## Distance Measure : Euclidean
 k_levels=c(1:10)
@@ -186,8 +190,10 @@ for(i in 1:nofReplications) {
 }
 )
 
-cvresult[,list(Accu=mean(Predictions==Real)),by=list(Method,Klev)]
-##### optimal k is 1 ##########
+comparison <- cvresult[,list(Accu=mean(Predictions==Real)),by=list(Method,Klev)]
+comparison <- comparison[order(Accu)]
+comparison[.N,]
+##### optimal k is 4 ##########
 
 
 ###### Distance Measure: Manhattan
@@ -224,7 +230,7 @@ cvresult[,list(Accu=mean(Predictions==Real)),by=list(Method,Klev)]
 ########### Task 1.3
 
 ## Euclidean
-euc_pred_time <- system.time(predict_knn <- knn(traindata,testdata, trainclass, k=1))
+euc_pred_time <- system.time(predict_knn <- knn(traindata,testdata, trainclass, k=3))
 Predictions=as.numeric(as.character(predict_knn))
 euc_comp <- (Predictions==testclass)
 table(Predictions,testclass)
@@ -244,4 +250,4 @@ cv_euc_time
 cv_manh_time
 euc_pred_time
 manh_pred_time
-
+rbind(cv_euc_time,cv_manh_time,euc_pred_time,manh_pred_time)
