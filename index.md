@@ -15,3 +15,8 @@
 ## Week 8 (November 17)
 
 [Here](files/HW3_Markdown.html) is my Homework 3 Solution.
+
+
+## Project Report January 7)
+
+[Here](files/Report.html) is our Project Report.
