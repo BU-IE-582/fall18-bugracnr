@@ -316,12 +316,35 @@ $(document).ready(function () {
 
 <div id="introduction" class="section level1">
 <h1>1. Introduction</h1>
-<p>Since sports betting market becoming more and more competitive, forecasting match results becoming increasingly popular. With easy-to-use programming tools and increased attention, sports forecasting has been widely researched. In this project, we were given historical information of English Premier League matches and odds given by different bookmakers. The aim was to provide better forecasts for 1x2 bets, using learning algorithms we have discussed during the semester. We considered the problem as a multi-class (Away, Tie, Home) classification problem and applied proper algorithms to obtain better forecasting results. At some point, we figured out that features we are using as crucial as the model we fit. Then, we tried to generate more relevant features that can improve our models’ performances. Although we applied and evaluated different algorithms, multinomial logistic regression was the outstanding one from the very beginning. Thus, at each round, we have submitted predictions resulted from our multinomial logistic regression model. Features used for training and prediction gained from the provided data. To prevent irrelevant information, we only considered matches after 2012. Attribute information is below: Unix_Date: unix date of the match Match_Hour: hour of the match (12 to 20) Match_Day: day of the match (1 to 7) Day_Diff: difference between teams’ # of days since last game played Home(Away)_Last_Yellow: number of yellow cards shown in the last game Home(Away)_Last_Red: number of red cards shown in the last game Home(Away)_Avg_Goal_Scored: average # of goals scored in the last 5 games Home(Away)_Avg_HT_Goal_Scored: average # of goals scored until half time in the last 5 games Home(Away)_Avg_Win: percentage of wins in the last 5 games<br />
-Home(Away)_Avg_Tie: percentage of ties in the last 5 games Home(Away)_Avg_Shots_Made: average # of shots in the last 5 games Home(Away)_Avg_SoT_Made: average # of shots on target in the last 5 games Home(Away)_Avg_Fouls_Committed: average # of fouls committed in the last 5 games Home(Away)_Avg_Corners: average # of corners in the last 5 games Home(Away)_Avg_Goal_Diff: average of the last 5 games’ goals differences Home(Away)_Avg_HT_Goal_Diff: average of the last 5 games’ half time goals differences Home(Away)_Avg_Shot_Diff: average of the last 5 games’ shots differences Home(Away)_Avg_SoT_Diff: average of the last 5 games’ shots on target differences Home(Away)_Avg_Foul_Diff: average of the last 5 games’ fauls differences Home(Away)_Avg_Corner_Diff: average of the last 5 games’ corners differences distance: distance between the cities of home and away teams Home(Away)_ELO: ELO rating of the team Additionally, we considered both opening and closing odds, in type 1x2, from several bookmakers as predictors.</p>
+<p>Since sports betting market becoming more and more competitive, forecasting match results becoming increasingly popular. With easy-to-use programming tools and increased attention, sports forecasting has been widely researched. In this project, we were given historical information of English Premier League matches and odds given by different bookmakers. The aim was to provide better forecasts for 1x2 bets, using learning algorithms we have discussed during the semester. We considered the problem as a multi-class (Away, Tie, Home) classification problem and applied proper algorithms to obtain better forecasting results. At some point, we figured out that features we are using as crucial as the model we fit. Then, we tried to generate more relevant features that can improve our models’ performances. Although we applied and evaluated different algorithms, multinomial logistic regression was the outstanding one from the very beginning. Thus, at each round, we have submitted predictions resulted from our multinomial logistic regression model. Features used for training and prediction gained from the provided data. To prevent irrelevant information, we only considered matches after 2012. Attribute information is below:</p>
+<p>Unix_Date: unix date of the match</p>
+<p>Match_Hour: hour of the match (12 to 20)</p>
+<p>Match_Day: day of the match (1 to 7)</p>
+<p>Day_Diff: difference between teams’ # of days since last game played</p>
+<p>Home(Away)_Last_Yellow: number of yellow cards shown in the last game</p>
+<p>Home(Away)_Last_Red: number of red cards shown in the last game</p>
+<p>Home(Away)_Avg_Goal_Scored: average # of goals scored in the last 5 games</p>
+<p>Home(Away)_Avg_HT_Goal_Scored: average # of goals scored until half time in the last 5 games</p>
+<p>Home(Away)_Avg_Win: percentage of wins in the last 5 games</p>
+<p>Home(Away)_Avg_Tie: percentage of ties in the last 5 games</p>
+<p>Home(Away)_Avg_Shots_Made: average # of shots in the last 5 games</p>
+<p>Home(Away)_Avg_SoT_Made: average # of shots on target in the last 5 games</p>
+<p>Home(Away)_Avg_Fouls_Committed: average # of fouls committed in the last 5 games</p>
+<p>Home(Away)_Avg_Corners: average # of corners in the last 5 games</p>
+<p>Home(Away)_Avg_Goal_Diff: average of the last 5 games’ goals differences</p>
+<p>Home(Away)_Avg_HT_Goal_Diff: average of the last 5 games’ half time goals differences</p>
+<p>Home(Away)_Avg_Shot_Diff: average of the last 5 games’ shots differences</p>
+<p>Home(Away)_Avg_SoT_Diff: average of the last 5 games’ shots on target differences</p>
+<p>Home(Away)_Avg_Foul_Diff: average of the last 5 games’ fauls differences</p>
+<p>Home(Away)_Avg_Corner_Diff: average of the last 5 games’ corners differences</p>
+<p>distance: distance between the cities of home and away teams</p>
+<p>Home(Away)_ELO: ELO rating of the team</p>
+<p>Additionally, we considered both opening and closing odds, in type 1x2, from several bookmakers as predictors.</p>
 </div>
 <div id="related-literature" class="section level1">
 <h1>2. Related Literature</h1>
-<p>In this project, we mainly benefited from statistical learning techniques discussed in IE 582 class and “An Introduction to Statistical Learning - with Applications in R”[1] book. The classification algorithms we utilized are namely multinomial logistic regression, k-nearest neighbor classification, bagging, decision trees, random forests, boosting and support vector machines. Above mentioned techniques are implemented respectively by using multinom function of “nnet”[2] package, knn.predict function of “KODAMA”[3] package, bagging function of “adabag”[4] package, rpart function of “rpart”[5] package, randomForest function of “randomForest”[6] package, gbm function of “gbm”[7] package and lastly svm function of “e1071”[8] package. To best of our knowledge, the papers written in the result prediction area are mainly benefited from the same models. However, the main distinction occurs in the features used in the papers. Rosli et al.[9] uses features showing the performance of teams, such as goals scored in the half time and full time, shots made and shots on target, and corners for both home and away teams. Hvattum et al.[10] utilizes ELO ratings for score prediction. In the project we utilized the mentioned features in addition to the odds of the bookmakers.</p>
+<p>In this project, we mainly benefited from statistical learning techniques discussed in IE 582 class and “An Introduction to Statistical Learning - with Applications in R”[1] book. The classification algorithms we utilized are namely multinomial logistic regression, k-nearest neighbor classification, bagging, decision trees, random forests, boosting and support vector machines. Above mentioned techniques are implemented respectively by using multinom function of “nnet”[2] package, knn.predict function of “KODAMA”[3] package, bagging function of “adabag”[4] package, rpart function of “rpart”[5] package, randomForest function of “randomForest”[6] package, gbm function of “gbm”[7] package and lastly svm function of “e1071”[8] package.</p>
+<p>To best of our knowledge, the papers written in the result prediction area are mainly benefited from the same models. However, the main distinction occurs in the features used in the papers. Rosli et al.[9] uses features showing the performance of teams, such as goals scored in the half time and full time, shots made and shots on target, and corners for both home and away teams. Hvattum et al.[10] utilizes ELO ratings for score prediction. In the project we utilized the mentioned features in addition to the odds of the bookmakers.</p>
 </div>
 <div id="approach-and-results" class="section level1">
 <h1>3. Approach and Results</h1>
@@ -329,13 +352,17 @@ Home(Away)_Avg_Tie: percentage of ties in the last 5 games Home(Away)_Avg_Shots_
 <h2>3.1 Data Loading and Preprocessing</h2>
 <div id="content-of-the-source-files" class="section level3">
 <h3>3.1.1 Content of the Source Files</h3>
-<p>The functions above are used for data preprocessing. The content of the functions are described below.</p>
+<pre class="r"><code>source('data_preprocessing.r')
+source('feature_extraction.r')
+source('performance_metrics.r')
+source('match_processing.r')</code></pre>
+<p>The source files above are used for data preprocessing. The content of the sources are described below.</p>
 <p>There are two functions in the data_preprocessing.r file, which is shown in the appendix 8.1. The first function “matches_data_preprocessing” takes raw match data. Raw data consists several types of team names (ie Manchester United as manchester-utd and manchester-united). The function firstly eliminates repeated names by standardizing the team names. Then, it adds the cities of the football clubs, which will be necessary for calculating distances between cities. After that, the function reformats the Unix Date to year-month-day format. Finally, the function produces result of the matches, and goals scored by each team from result information, which is included in the raw matches data in the form of “Home Score-Away Score”.</p>
 <p>The second function is details_data_preprocessing and it produces the chosen odd details from raw odds data. In the raw odds data, several odds such as over-under, asian handicap etc. are included. The function produces the types of odds chosen by the user.</p>
 <p>feature_extraction.r file consists of a function named extract_features.openclose, and shown in the appendix 8.2. The function takes output of details_data_preprocessing function and melts the odds of each bookmaker. Additionally, as there are multiple odds determined by the bookmaker as time proceeds, each match has more two odds from the same bookmaker. The function reduces those odds into two namely open and close. Open odds and close odds are the first and the last odds determined by the bookmakers, and they are the output of the extract_features.openclose() function.</p>
 <p>The third file used in the project is performance_metrics.r and shown in the appendix 8.3. This file contains two functions namely RPS_single and RPS_matrix. As their names imply, the first function produces an RPS score and the second function produces an RPS matrix which gives RPS scores for each match.</p>
 <p>The content of the match_processing.r file contains match_processing() function and takes the preprocessed matches data, average days and method for average calculations as inputs. The content is shown in the appendix 8.4. The aim of the function is to add several features described in the introduction part to the matches data. Average days and method of average are the inputs used for calculating the features such as average goals, average corners etc. They determine how many matches will be used for generating average information and which moving average method will be used for calculation.</p>
-<p>Lastly, elo_data.r file contains the codes necessary for generating elo features and shown in appendix 8.5. The chunk firstly downloads precalculated elo data from the clubelo.com website and produces a .csv file used for elo feature extraction in the match_processing() function. As it is used only once for generating elo_data.csv, it is not included in the rest of the codes.</p>
+<p>Lastly, elo_data.r file contains the codes necessary for generating elo features and shown in appendix 8.5. The file firstly downloads precalculated elo data from the clubelo.com website and produces a .csv file used for elo feature extraction in the match_processing() function.</p>
 </div>
 <div id="load-data-and-preprocess" class="section level3">
 <h3>3.1.2 Load Data and Preprocess</h3>
@@ -451,12 +478,12 @@ confusion_matrix_knn_kodama &lt;- table(pred,testclass)
 confusion_matrix_knn_kodama</code></pre>
 <pre><code>##     testclass
 ## pred  0  1  2
-##    0  2  3  5
-##    1 40 91 36
-##    2 10 17 46</code></pre>
+##    0  2  2  5
+##    1 40 91 37
+##    2 10 18 45</code></pre>
 <pre class="r"><code>accuracy_knn_kodama &lt;- sum(pred==testclass)/length(testclass)
 accuracy_knn_kodama</code></pre>
-<pre><code>## [1] 0.556</code></pre>
+<pre><code>## [1] 0.552</code></pre>
 <pre class="r"><code># view probabilities (all class probabilities are returned)
 prob &lt;- KODAMA::knn.probability(1:nrow(train1), (nrow(train1)+1):nrow(x), trainclass, kdist, k=95)
 
@@ -505,7 +532,7 @@ prob_rearranged[2,] &lt;- baging_probs[1,]
 rps4mat &lt;- RPS_matrix(t(prob_rearranged),t(results))
 rps4 &lt;- mean(rps4mat)
 rps4</code></pre>
-<pre><code>## [1] 0.25126</code></pre>
+<pre><code>## [1] 0.25146</code></pre>
 <pre class="r"><code>output &lt;- rbind(output, data.table(Method = &quot;Bagging&quot;, Accuracy = bag_acc, RPS = rps4))</code></pre>
 </div>
 <div id="decision-tree" class="section level2">
@@ -572,7 +599,7 @@ probs5[,3] &lt;- probs_rf[,1]
 rps6 &lt;- RPS_matrix(probs5, t(results))
 rps6 &lt;- mean(rps6)
 rps6</code></pre>
-<pre><code>## [1] 0.2013317</code></pre>
+<pre><code>## [1] 0.2039679</code></pre>
 <pre class="r"><code>output &lt;- rbind(output, data.table(Method = &quot;Random Forest&quot;, Accuracy = rf_acc, RPS = rps6))</code></pre>
 </div>
 <div id="boosting" class="section level2">
@@ -597,7 +624,7 @@ probboost[,2] &lt;- probboost2[,1]
 rps7 &lt;- RPS_matrix(probboost, t(results))
 rps7 &lt;- mean(rps7)
 rps7</code></pre>
-<pre><code>## [1] 0.2059583</code></pre>
+<pre><code>## [1] 0.1971559</code></pre>
 <pre class="r"><code>output &lt;- rbind(output, data.table(Method = &quot;Boosting&quot;, Accuracy = boost_acc, RPS = rps7))</code></pre>
 </div>
 <div id="support-vector-machines" class="section level2">
@@ -630,7 +657,7 @@ probsvm[,3] &lt;- probsvm1[,1]
 rps8 &lt;- RPS_matrix(probsvm, t(results))
 rps8 &lt;- mean(rps8)
 rps8</code></pre>
-<pre><code>## [1] 0.2367878</code></pre>
+<pre><code>## [1] 0.2357629</code></pre>
 <pre class="r"><code>output &lt;- rbind(output, data.table(Method = &quot;SVM&quot;, Accuracy = svm_acc, RPS = rps8))</code></pre>
 <p>To compare our results, we calculated an RPS score for the bookmaker Pinnacle. Its results are also shown below.</p>
 <pre class="r"><code>pinnacle &lt;- testdata[,c(93,108,123)]
@@ -661,8 +688,8 @@ pinn_acc &lt;-sum(pinnacle_pred==testclass)/nrow(test5)
 output &lt;- rbind(output, data.table(Method = &quot;Pinnacle&quot;, Accuracy = pinn_acc, RPS = rps10))</code></pre>
 </div>
 </div>
-<div id="results" class="section level1">
-<h1>4. Results</h1>
+<div id="results-and-discussion" class="section level1">
+<h1>4. Results and Discussion</h1>
 <pre class="r"><code>cols</code></pre>
 <pre><code>##   [1] &quot;Unix_Date&quot;                  &quot;Match_Hour&quot;                
 ##   [3] &quot;Match_Day&quot;                  &quot;Day_Diff&quot;                  
@@ -732,12 +759,12 @@ output &lt;- rbind(output, data.table(Method = &quot;Pinnacle&quot;, Accuracy = 
 <pre class="r"><code>output</code></pre>
 <pre><code>##                   Method Accuracy       RPS
 ## 1: Multinomial Log. Reg.    0.600 0.1937625
-## 2:                   KNN    0.556 0.1904133
-## 3:               Bagging    0.564 0.2512600
+## 2:                   KNN    0.552 0.1904133
+## 3:               Bagging    0.564 0.2514600
 ## 4:         Decision Tree    0.568 0.2121297
-## 5:         Random Forest    0.568 0.2013317
-## 6:              Boosting    0.540 0.2059583
-## 7:                   SVM    0.556 0.2367878
+## 5:         Random Forest    0.568 0.2039679
+## 6:              Boosting    0.572 0.1971559
+## 7:                   SVM    0.552 0.2357629
 ## 8:              Pinnacle    0.560 0.1855880</code></pre>
 <p>The results shown above are generated by using all of the features.The features contains all the columns generated by several functions described in the above sections and odds of the all bookmakers. However, some of those features do not contribute to the predictions well, therefore, by eliminating unnecessary columns rps scores can be lowered. According to our analysis throughout the submissions most of the bookmakers generate similar odds to the matches, therefore, using all odds is not an effective method. Therefore, reducing number of bookmakers is a good idea. To decide which bookmakers to keep, we made an PCA analysis on bookmakers data.</p>
 <pre class="r"><code>pcadata &lt;- traindata[,40:ncol(traindata)]
@@ -929,16 +956,25 @@ summary(pcares)</code></pre>
 ## Odd_Close_oddX_betathome   -0.03956297 0.073577909
 ## Odd_Close_oddX_bwin        -0.04155865 0.078103482</code></pre>
 <p>As it can be seen above first two components of the PCA explains 96% of the variance. However, the contributions of the bookmakers to first two components are relatively same. Therefore, PCA analysis did not help us which bookmakers to keep. We randomly decided to keep a bookmaker, which is Pinnacle. Additionally, we determined some of the features which are not performing well by using random selection among features. The final selection of features consist of Last_Red, Avg_Goal_Scored, Avg_Win, Avg_Sot_Made, Avg_Corners, and ELO for both home and away teams. Additionally, we kept distance data as well. The results of the selection are shown below.</p>
-<pre class="r"><code>output</code></pre>
-<pre><code>##                    Method Accuracy       RPS
-## 1: Multinomial Log. Reg.2    0.568 0.1842195
-## 2:                   KNN2    0.568 0.1908833
-## 3:               Bagging2    0.572 0.2662600
-## 4:         Decision Tree2    0.552 0.2022650
-## 5:         Random Forest2    0.552 0.1951196
-## 6:              Boosting2    0.544 0.1904165
-## 7:                   SVM2    0.576 0.2336692</code></pre>
-<p>As it can be seen above, multinomial model performs as well as bookmaker Pinnacle after feature selection.</p>
+<pre class="r"><code>output &lt;- rbind(output,output2)
+output[order(RPS)]</code></pre>
+<pre><code>##                     Method Accuracy       RPS
+##  1: Multinomial Log. Reg.2    0.568 0.1842195
+##  2:               Pinnacle    0.560 0.1855880
+##  3:              Boosting2    0.544 0.1892907
+##  4:                    KNN    0.552 0.1904133
+##  5:                   KNN2    0.564 0.1908833
+##  6:  Multinomial Log. Reg.    0.600 0.1937625
+##  7:         Random Forest2    0.552 0.1942904
+##  8:               Boosting    0.572 0.1971559
+##  9:         Decision Tree2    0.552 0.2022650
+## 10:          Random Forest    0.568 0.2039679
+## 11:          Decision Tree    0.568 0.2121297
+## 12:                   SVM2    0.576 0.2330810
+## 13:                    SVM    0.552 0.2357629
+## 14:                Bagging    0.564 0.2514600
+## 15:               Bagging2    0.564 0.2529800</code></pre>
+<p>According to the results shown above table, firstly there is no correlation between prediction accuracy and RPS. The reason is accuracy computes the ratio of correctly predicted matches to all matches, while rps is based on probabilities assigned to each class. Additionally, feature selection can decrease RPS, however, it seems it has no positive effect on prediction accuracy. For instance, the feature selection decreased RPS of multinomial logistic regression model in the example illustrated. However, it increased RPS of bagging. Throughout the project, as the standard multinomial model performed best among all models, we focused on its performance and the ways to increase it further. Feature selection method worked well for that aim. One other important result to see is that the multinomial model outperforms Pinnacle in the example. However, even though generally this was the case, our submmissions’ overall average performance was under Pinnacle. To conclude we can say that based on our experience, by considering the RPS performance and computational speed, standard multinomial model fits best among all models that we implemented.</p>
 </div>
 <div id="conclusions-and-future-work" class="section level1">
 <h1>5. Conclusions and Future Work</h1>
@@ -950,7 +986,16 @@ summary(pcares)</code></pre>
 </div>
 <div id="references" class="section level1">
 <h1>7. References</h1>
-<p>[1] James, Gareth, et al. An introduction to statistical learning. Vol. 112. New York: springer, 2013. [2] “nnet - The R Project for Statistical Computing.” <a href="https://cran.r-project.org/web/packages/nnet/nnet.pdf" class="uri">https://cran.r-project.org/web/packages/nnet/nnet.pdf</a>. Access Date: 6 Jan. 2019. [3] “CRAN - Package KODAMA.” 18 Oct. 2018, <a href="https://cran.r-project.org/package=KODAMA" class="uri">https://cran.r-project.org/package=KODAMA</a>. Erişim tarihi: 6 Jan. 2019. [4] “Package ‘adabag’ - The R Project for Statistical Computing.” 14 Oct. 2015, <a href="https://cran.r-project.org/web/packages/adabag/adabag.pdf" class="uri">https://cran.r-project.org/web/packages/adabag/adabag.pdf</a>. Access Date: 6 Jan. 2019. [5] “Package ‘rpart’ - The R Project for Statistical Computing.” <a href="https://cran.r-project.org/web/packages/rpart/rpart.pdf" class="uri">https://cran.r-project.org/web/packages/rpart/rpart.pdf</a>. Access Date: 6 Jan. 2019. [6] “Package ‘randomForest’ - The R Project for Statistical Computing.” <a href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf" class="uri">https://cran.r-project.org/web/packages/randomForest/randomForest.pdf</a>. Access Date: 6 Jan. 2019. [7] “Package ‘gbm’ - The R Project for Statistical Computing.” 16 Sep. 2018, <a href="https://cran.r-project.org/web/packages/gbm/gbm.pdf" class="uri">https://cran.r-project.org/web/packages/gbm/gbm.pdf</a>. Access Date: 6 Jan. 2019. [8] “e1071 - The R Project for Statistical Computing.” 28 Jul. 2018, <a href="https://cran.r-project.org/web/packages/e1071/e1071.pdf" class="uri">https://cran.r-project.org/web/packages/e1071/e1071.pdf</a>. Access Date: 6 Jan. 2019. [9] Rosli, Che Mohamad Firdaus Che Mohd, et al. “A Comparative Study of Data Mining Techniques on Football Match Prediction.” Journal of Physics: Conference Series. Vol. 1020. No. 1. IOP Publishing, 2018. [10] Hvattum, Lars Magnus, and Halvard Arntzen. “Using ELO ratings for match result prediction in association football.” International Journal of forecasting 26.3 (2010): 460-470.</p>
+<p>[1] James, Gareth, et al. An introduction to statistical learning. Vol. 112. New York: springer, 2013.</p>
+<p>[2] “nnet - The R Project for Statistical Computing.” <a href="https://cran.r-project.org/web/packages/nnet/nnet.pdf" class="uri">https://cran.r-project.org/web/packages/nnet/nnet.pdf</a>. Access Date: 6 Jan. 2019.</p>
+<p>[3] “CRAN - Package KODAMA.” 18 Oct. 2018, <a href="https://cran.r-project.org/package=KODAMA" class="uri">https://cran.r-project.org/package=KODAMA</a>. Erişim tarihi: 6 Jan. 2019.</p>
+<p>[4] “Package ‘adabag’ - The R Project for Statistical Computing.” 14 Oct. 2015, <a href="https://cran.r-project.org/web/packages/adabag/adabag.pdf" class="uri">https://cran.r-project.org/web/packages/adabag/adabag.pdf</a>. Access Date: 6 Jan. 2019.</p>
+<p>[5] “Package ‘rpart’ - The R Project for Statistical Computing.” <a href="https://cran.r-project.org/web/packages/rpart/rpart.pdf" class="uri">https://cran.r-project.org/web/packages/rpart/rpart.pdf</a>. Access Date: 6 Jan. 2019.</p>
+<p>[6] “Package ‘randomForest’ - The R Project for Statistical Computing.” <a href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf" class="uri">https://cran.r-project.org/web/packages/randomForest/randomForest.pdf</a>. Access Date: 6 Jan. 2019.</p>
+<p>[7] “Package ‘gbm’ - The R Project for Statistical Computing.” 16 Sep. 2018, <a href="https://cran.r-project.org/web/packages/gbm/gbm.pdf" class="uri">https://cran.r-project.org/web/packages/gbm/gbm.pdf</a>. Access Date: 6 Jan. 2019.</p>
+<p>[8] “e1071 - The R Project for Statistical Computing.” 28 Jul. 2018, <a href="https://cran.r-project.org/web/packages/e1071/e1071.pdf" class="uri">https://cran.r-project.org/web/packages/e1071/e1071.pdf</a>. Access Date: 6 Jan. 2019.</p>
+<p>[9] Rosli, Che Mohamad Firdaus Che Mohd, et al. “A Comparative Study of Data Mining Techniques on Football Match Prediction.” Journal of Physics: Conference Series. Vol. 1020. No. 1. IOP Publishing, 2018.</p>
+<p>[10] Hvattum, Lars Magnus, and Halvard Arntzen. “Using ELO ratings for match result prediction in association football.” International Journal of forecasting 26.3 (2010): 460-470.</p>
 </div>
 <div id="appendices" class="section level1">
 <h1>8. Appendices</h1>
