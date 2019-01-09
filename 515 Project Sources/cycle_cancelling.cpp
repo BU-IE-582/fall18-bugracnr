@@ -165,10 +165,20 @@ void augment(int min, Arc& a, Arc& b)
 int main()
 {
 	GNode nodes[6];
-	int d[6] = { 0, 100000, 100000,  100000,  100000,  100000};
+	int d[6] = { 0, 100000, 100000,  100000,  100000 ,  100000 };
 	bool labels[6] = { 0 ,0,0,0,0,1};
-
-	for (int i = 0; i < 6; i++)
+	int from[7] = { 0,1,1,2,2,3,4};
+	int to[7] = { 1,2,3,3,4,4,5};
+	int cost[7] = {0,2,2,1,3,1,0};
+	int capacity[7] = { 4,4,2,2,3,5,4};
+	int arc_no = 7,
+		res_arc_no,
+		node_no = 6,
+		last_node;
+	res_arc_no = arc_no * 2;
+	last_node = node_no - 1;
+	Arc arcs[7], res_arcs[14];
+	for (int i = 0; i < node_no; i++)
 	{
 		nodes[i].d = d[i];
 		nodes[i].pred = 0;
@@ -178,15 +188,12 @@ int main()
 
 	
 
-	Arc arcs[9], res_arcs[18];
 	
-	int from[9]		= { 0, 0, 1,  1, 2, 3, 4, 4, 4 };
-	int to[9]		= { 1, 2, 2,  3, 4, 5, 1, 3, 5 };
-	int capacity[9] = { 5, 4, 6,  3, 8, 7,10,20, 2 };
-	int cost[9]		= { 0, 0, 3, 10, 4, 0,-8, 3, 0 };
+	
+
 
 	// Construction of arcs from the data
-	for(int i = 0; i < 9; i++)
+	for(int i = 0; i < arc_no; i++)
 	{
 		from[i] = from[i] ;
 		to[i] = to[i] ;
@@ -194,22 +201,22 @@ int main()
 		arcs[i].to = to[i];
 		arcs[i].capacity = capacity[i];
 		arcs[i].cost = cost[i];
-		arcs[i].mate = i + 9;
+		arcs[i].mate = i + arc_no;
 	}
 	
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < arc_no; i++)
 		cout << "From: " << arcs[i].from << " To: " << arcs[i].to << " Capacity: " << arcs[i].capacity << " Cost :" << arcs[i].cost << endl;
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < arc_no; i++)
 		res_arcs[i] = arcs[i];
 
-	for (int i = 9; i < 18; i++)
+	for (int i = arc_no; i < res_arc_no; i++)
 	{
-		res_arcs[i].from = arcs[i-9].to;
-		res_arcs[i].to = arcs[i - 9].from;
+		res_arcs[i].from = arcs[i-arc_no].to;
+		res_arcs[i].to = arcs[i - arc_no].from;
 		res_arcs[i].capacity = 0;
-		res_arcs[i].cost = -arcs[i - 9].cost;
-		res_arcs[i].mate = i - 9;
+		res_arcs[i].cost = -arcs[i - arc_no].cost;
+		res_arcs[i].mate = i - arc_no;
 
 	}
 
@@ -218,10 +225,10 @@ int main()
 	list label_list, augment_list;
 
 	//Beginning of max flow labeling algorithm
-	while (nodes[5].label == 1)
+	while (nodes[last_node].label == 1)
 	{
 		//unlabel all
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < node_no; i++)
 		{
 			nodes[i].label = 0;
 			nodes[i].pred = 0;
@@ -239,7 +246,7 @@ int main()
 			// remove element from LIST
 			label_list.delete_first();
 			//for each arc emanating from the element 
-			for (int i = 0; i < 18; i++)
+			for (int i = 0; i < res_arc_no; i++)
 			{
 				//if to is not labeled, label and keep pred info and arc info
 				if (res_arcs[i].from == j && nodes[res_arcs[i].to].label == 0 && res_arcs[i].capacity>0)
@@ -253,12 +260,12 @@ int main()
 			}
 		}
 		//if t is labeled
-		if (nodes[5].label == 1)
+		if (nodes[last_node].label == 1)
 		{
-			augment_list.createnode(5);
+			augment_list.createnode(last_node);
 
 			//add preds to beginning of the list
-			int j = nodes[5].pred;
+			int j = nodes[last_node].pred;
 			while (j != 0)
 			{
 				augment_list.insert_start(j);
@@ -291,7 +298,7 @@ int main()
 			}
 
 		
-			for (int i = 0; i < 18; i++)
+			for (int i = 0; i < res_arc_no; i++)
 				cout << "*** Augmented: From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " Capacity: " << res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
 
 		}
@@ -299,7 +306,7 @@ int main()
 
 	cout << "Last Round: Augmentation: " << endl;
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < arc_no; i++)
 		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " Flow: " << arcs[i].capacity - res_arcs[i].capacity << " Cost :" << res_arcs[i].cost  << endl;
 	
 	
@@ -315,7 +322,7 @@ int main()
 		int k = 0;
 		neg_cycle = false;
 
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < node_no; i++)
 		{
 			nodes[i].d = 1000000;
 			nodes[i].pred = 0;
@@ -329,7 +336,7 @@ int main()
 		while (done == false)
 		{
 			done = true;
-			for (int i = 0; i < 18; i++)
+			for (int i = 0; i < res_arc_no; i++)
 			{
 				if (nodes[res_arcs[i].to].d > nodes[res_arcs[i].from].d + res_arcs[i].cost && res_arcs[i].capacity>0)
 				{
@@ -344,7 +351,7 @@ int main()
 
 			k = k + 1;
 
-			if (k >= 6)
+			if (k >= node_no)
 			{
 				done = true;
 				neg_cycle = true;
@@ -353,7 +360,7 @@ int main()
 
 
 		// Result output loop
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < node_no; i++)
 		{
 			cout << "Node i = " << i  << "  -  Pred i = " << nodes[i].pred << 
 			" dist: "	<< nodes[i].d << " Pred arc = " << nodes[i].pred_arc <<  endl;
@@ -368,43 +375,39 @@ int main()
 		if (neg_cycle == true)
 		{
 			int i = 0;
+			int c = 0;
 			while (cycle_found == false)
 			{
-				while (nodes[i].label == 1)
+				if (nodes[i].pred == i)
 				{
-					if (cycle_found == true)
-						break;
-					int j = nodes[i].pred;
-					int c = 0;
-
-					while (c <= 6)
-					{
-						if (j == i)
-						{
-
-
-							negative_cycle.createnode(i);
-							j = nodes[i].pred;
-
-							while (i != j)
-							{
-								negative_cycle.createnode(j);
-								j = nodes[j].pred;
-							}
-
-							cycle_found = true;
-							break;
-						}
-						else
-						{
-							j = nodes[j].pred;
-							c++;
-						}
-					}
+					i++;
 				}
-				if (cycle_found == true)
-					break;
-				i++;
+
+				int j = nodes[i].pred;
+				
+				while (j != i & c <= node_no)
+				{
+					j = nodes[j].pred;
+					c++;
+				}
+				if (i != j)
+				{
+					i++;
+					c = 0;
+				}
+				else
+				{
+					negative_cycle.createnode(i);
+					j = nodes[i].pred;
+					while (i != j)
+					{
+						negative_cycle.createnode(j);
+						j = nodes[j].pred;
+					}
+					cycle_found = true;
+				}
+
+
 			}
 		}
 
@@ -450,7 +453,7 @@ int main()
 
 		cout << "Bellman: Augmentation: " << endl;
 
-		for (int i = 0; i < 18; i++)
+		for (int i = 0; i < res_arc_no; i++)
 			cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " Capacity: " << res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
 
 
@@ -459,7 +462,7 @@ int main()
 	
 	cout << "Final Network: " << endl;
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < arc_no; i++)
 		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " flow: " << arcs[i].capacity - res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
 
 	

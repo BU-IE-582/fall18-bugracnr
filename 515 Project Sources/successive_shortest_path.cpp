@@ -1,6 +1,6 @@
 
 #include <iostream>
-
+#include <time.h>
 using namespace std;
 
 
@@ -168,50 +168,55 @@ void augment(int min, int index, int limit, Arc& a, Arc& b)
 
 int main()
 {
-	GNode nodes[6];
+	GNode nodes[4];
 	
-	int b[6] = { 5,3,0,0,-2,-6 },
-		from[10] = { 0,0,1,1,1,2,2,3,3,4 },
-		to[10] = { 1,2,2,3,4,3,4,4,5,5 },
-		cap[10] = { 10,6,3,1,7,6,5,3,1,8 },
-		cost[10] = { 4,3,4,2,5,1,1,1,1,2 };
+	int b[4] = { 4,0,0,-4},
+		from[5] = { 0,0,1,1,2},
+		to[5] = { 1,2,2,3,3,},
+		cap[5] = { 4,2,2,3,5 },
+		cost[5] = { 2,2,1,3,1},
+		arc_no = 5,
+		res_arc_no,
+		node_no = 4,
+		last_node;
+	res_arc_no = arc_no * 2;
+	last_node = node_no - 1;
 
-
-	Arc arcs[10], res_arcs[20];
+	Arc arcs[5], res_arcs[10];
 
 
 	// Construction of arcs from the data
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < arc_no; i++)
 	{
 		arcs[i].from = from[i];
 		arcs[i].to = to[i];
 		arcs[i].capacity = cap[i];
 		arcs[i].cost = cost[i];
 		arcs[i].reduced_cost = cost[i];
-		arcs[i].mate = i + 10;
+		arcs[i].mate = i + arc_no;
 		arcs[i].flow = 0;
 	}
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < arc_no; i++)
 		cout << "From: " << arcs[i].from << " To: " << arcs[i].to << " Capacity: " << arcs[i].capacity << " Cost :" << arcs[i].cost << endl;
 
 	//construction of residual net
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < arc_no; i++)
 		res_arcs[i] = arcs[i];
 
-	for (int i = 10; i < 20; i++)
+	for (int i = arc_no; i < res_arc_no; i++)
 	{
-		res_arcs[i].from = arcs[i - 10].to;
-		res_arcs[i].to = arcs[i - 10].from;
+		res_arcs[i].from = arcs[i - arc_no].to;
+		res_arcs[i].to = arcs[i - arc_no].from;
 		res_arcs[i].capacity = 0;
-		res_arcs[i].cost = -arcs[i - 10].cost;
-		res_arcs[i].reduced_cost = -arcs[i - 10].cost;
-		res_arcs[i].mate = i - 10;
+		res_arcs[i].cost = -arcs[i - arc_no].cost;
+		res_arcs[i].reduced_cost = -arcs[i - arc_no].cost;
+		res_arcs[i].mate = i - arc_no;
 		res_arcs[i].flow = 0;
 	}
 
 	// initialization of imbalance and node potentials
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < node_no; i++)
 	{
 		nodes[i].b = b[i];
 		nodes[i].imbalance = nodes[i].b;
@@ -221,7 +226,7 @@ int main()
 	// initialization of excess and deficit lists
 	list excess, deficit;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < node_no; i++)
 	{
 		if (nodes[i].imbalance > 0)
 			excess.createnode(i);
@@ -230,6 +235,7 @@ int main()
 	}
 
 	
+	clock_t tStart = clock();
 
 	int cou = 0;
 
@@ -249,7 +255,7 @@ int main()
 		// shortest path by bellman ford
 		bool done = false;
 		
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < node_no; i++)
 		{
 			nodes[i].d = 1000000;
 			nodes[i].pred = 0;
@@ -262,7 +268,7 @@ int main()
 		while (done == false)
 		{
 			done = true;
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < res_arc_no; i++)
 			{
 				if (nodes[res_arcs[i].to].d > nodes[res_arcs[i].from].d + res_arcs[i].cost && res_arcs[i].capacity>0)
 				{
@@ -315,7 +321,7 @@ int main()
 
 		for (int i = 0; i < shortest_arcs.length(); i++)
 		{
-			augment(min, shortest_arcs.get_element(i), 10, res_arcs[shortest_arcs.get_element(i)], res_arcs[res_arcs[shortest_arcs.get_element(i)].mate]);
+			augment(min, shortest_arcs.get_element(i), arc_no, res_arcs[shortest_arcs.get_element(i)], res_arcs[res_arcs[shortest_arcs.get_element(i)].mate]);
 		}
 
 		for (int i = 0; i < shortest_arcs.length(); i++)
@@ -338,7 +344,7 @@ int main()
 			deficit.delete_first();
 		}
 
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < node_no; i++)
 		{
 			if (nodes[i].imbalance > 0)
 				excess.createnode(i);
@@ -346,14 +352,14 @@ int main()
 				deficit.createnode(i);
 		}
 
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < res_arc_no; i++)
 		{
 			res_arcs[i].reduced_cost = res_arcs[i].cost - nodes[res_arcs[i].from].potential + nodes[res_arcs[i].to].potential;
 		}
 
 	
 
-		for(int i = 0; i < 6; i++)
+		for(int i = 0; i < node_no; i++)
 			cout << "Node i = " << i << "  -  Pred i = " << nodes[i].pred <<
 			" dist: " << nodes[i].d << " Pred arc = " << nodes[i].pred_arc 
 			<< "   imbalance :  " << nodes[i].imbalance << endl;
@@ -363,8 +369,10 @@ int main()
 
 }
 
-	for (int i = 0; i < 20; i++)
-		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << "Flow: " << res_arcs[i].flow << " Capacity: " << res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
+	for (int i = 0; i < res_arc_no; i++)
+		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " Flow: " << res_arcs[i].flow << " Capacity: " << res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
+
+	printf("Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 
 	char c;
