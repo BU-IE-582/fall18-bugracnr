@@ -97,6 +97,7 @@ public:
 		}
 		return i;
 	}
+
 	void insert_start(int value)
 	{
 		node *temp = new node;
@@ -105,53 +106,12 @@ public:
 		head = temp;
 	}
 
-	void insert_position(int pos, int value)
-	{
-		node *pre = new node;
-		node *cur = new node;
-		node *temp = new node;
-		cur = head;
-		for (int i = 1; i<pos; i++)
-		{
-			pre = cur;
-			cur = cur->next;
-		}
-		temp->data = value;
-		pre->next = temp;
-		temp->next = cur;
-	}
 	void delete_first()
 	{
 		node *temp = new node;
 		temp = head;
 		head = head->next;
 		delete temp;
-	}
-	void delete_last()
-	{
-		node *current = new node;
-		node *previous = new node;
-		current = head;
-		while (current->next != NULL)
-		{
-			previous = current;
-			current = current->next;
-		}
-		tail = previous;
-		previous->next = NULL;
-		delete current;
-	}
-	void delete_position(int pos)
-	{
-		node *current = new node;
-		node *previous = new node;
-		current = head;
-		for (int i = 1; i<pos; i++)
-		{
-			previous = current;
-			current = current->next;
-		}
-		previous->next = current->next;
 	}
 };
 
@@ -168,21 +128,21 @@ void augment(int min, int index, int limit, Arc& a, Arc& b)
 
 int main()
 {
-	GNode nodes[4];
-	
-	int b[4] = { 4,0,0,-4},
-		from[5] = { 0,0,1,1,2},
-		to[5] = { 1,2,2,3,3,},
-		cap[5] = { 4,2,2,3,5 },
-		cost[5] = { 2,2,1,3,1},
-		arc_no = 5,
-		res_arc_no,
-		node_no = 4,
-		last_node;
+	GNode nodes[6];
+
+	int b[6] = { 5,3,0,0,-2,-6 },
+		from[10] = { 0,0,1,1,1,2,2,3,3,4 },
+		to[10] = { 1,2,2,3,4,3,4,4,5,5 },
+		cap[10] = { 10,6,3,1,7,6,5,3,1,8 },
+		cost[10] = { 4,3,4,2,5,1,1,1,1,2 },
+		arc_no = 10,
+		res_arc_no = 20,
+		node_no = 6,
+		last_node = 5;
 	res_arc_no = arc_no * 2;
 	last_node = node_no - 1;
 
-	Arc arcs[5], res_arcs[10];
+	Arc arcs[10], res_arcs[20];
 
 
 	// Construction of arcs from the data
@@ -372,8 +332,14 @@ int main()
 	for (int i = 0; i < res_arc_no; i++)
 		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " Flow: " << res_arcs[i].flow << " Capacity: " << res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
 
-	printf("Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+	cout << "Final Network: " << endl;
 
+	for (int i = 0; i < arc_no; i++)
+		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " flow: " << arcs[i].capacity - res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
+
+	cout << "n: " << node_no << " m: " << arc_no << "  ";
+
+	printf("Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	char c;
 	cout << "Press e to exit..." << endl;

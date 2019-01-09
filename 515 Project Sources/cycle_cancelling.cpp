@@ -1,7 +1,7 @@
 // IE 515 - Graphs and Network Flows Project
 
 #include <iostream>
-
+#include <time.h>
 using namespace std;
 
 
@@ -104,53 +104,13 @@ public:
 		head = temp;
 	}
 
-	void insert_position(int pos, int value)
-	{
-		node *pre = new node;
-		node *cur = new node;
-		node *temp = new node;
-		cur = head;
-		for (int i = 1; i<pos; i++)
-		{
-			pre = cur;
-			cur = cur->next;
-		}
-		temp->data = value;
-		pre->next = temp;
-		temp->next = cur;
-	}
+	
 	void delete_first()
 	{
 		node *temp = new node;
 		temp = head;
 		head = head->next;
 		delete temp;
-	}
-	void delete_last()
-	{
-		node *current = new node;
-		node *previous = new node;
-		current = head;
-		while (current->next != NULL)
-		{
-			previous = current;
-			current = current->next;
-		}
-		tail = previous;
-		previous->next = NULL;
-		delete current;
-	}
-	void delete_position(int pos)
-	{
-		node *current = new node;
-		node *previous = new node;
-		current = head;
-		for (int i = 1; i<pos; i++)
-		{
-			previous = current;
-			current = current->next;
-		}
-		previous->next = current->next;
 	}
 };
 
@@ -164,20 +124,22 @@ void augment(int min, Arc& a, Arc& b)
 // end of linked list
 int main()
 {
-	GNode nodes[6];
-	int d[6] = { 0, 100000, 100000,  100000,  100000 ,  100000 };
-	bool labels[6] = { 0 ,0,0,0,0,1};
-	int from[7] = { 0,1,1,2,2,3,4};
-	int to[7] = { 1,2,3,3,4,4,5};
-	int cost[7] = {0,2,2,1,3,1,0};
-	int capacity[7] = { 4,4,2,2,3,5,4};
-	int arc_no = 7,
-		res_arc_no,
-		node_no = 6,
-		last_node;
-	res_arc_no = arc_no * 2;
-	last_node = node_no - 1;
-	Arc arcs[7], res_arcs[14];
+	GNode nodes[8];
+	int d[8] = { 0, 100000, 100000,  100000,  100000,  100000, 100000 , 100000 };
+	bool labels[8] = { 0 ,0,0,0,0,0,0,1 };
+
+	Arc arcs[14], res_arcs[28];
+
+	int from[14] = { 0,0,1,1,2,2,2,3,3,4,4,5,5,6 };
+	int to[14] = { 1,2,2,3,3,4,5,4,5,5,6,6,7,7 };
+	int capacity[14] = { 5,3,10,6,3,1,7,6,5,3,1,8,2,6 };
+	int cost[14] = { 0,0,4,3,4,2,5,1,1,1,1,2,0,0 };
+	int arc_no = 14,
+		res_arc_no = 28,
+		node_no = 8,
+		last_node = 7;
+
+
 	for (int i = 0; i < node_no; i++)
 	{
 		nodes[i].d = d[i];
@@ -205,7 +167,7 @@ int main()
 	}
 	
 	for (int i = 0; i < arc_no; i++)
-		cout << "From: " << arcs[i].from << " To: " << arcs[i].to << " Capacity: " << arcs[i].capacity << " Cost :" << arcs[i].cost << endl;
+		cout << "From: " << arcs[i].from -1 << " To: " << arcs[i].to -1 << " Capacity: " << arcs[i].capacity << " Cost :" << arcs[i].cost << endl;
 
 	for (int i = 0; i < arc_no; i++)
 		res_arcs[i] = arcs[i];
@@ -221,7 +183,8 @@ int main()
 	}
 
 
-	
+	clock_t tStart = clock();
+
 	list label_list, augment_list;
 
 	//Beginning of max flow labeling algorithm
@@ -463,7 +426,11 @@ int main()
 	cout << "Final Network: " << endl;
 
 	for (int i = 0; i < arc_no; i++)
-		cout << "From: " << res_arcs[i].from << " To: " << res_arcs[i].to << " flow: " << arcs[i].capacity - res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
+		cout << "From: " << res_arcs[i].from - 1 << " To: " << res_arcs[i].to -1 << " flow: " << arcs[i].capacity - res_arcs[i].capacity << " Cost :" << res_arcs[i].cost << endl;
+
+	cout << "n: " << node_no << " m: " << arc_no << "  ";
+
+	printf("Time taken: %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 
 	
 	char c;
